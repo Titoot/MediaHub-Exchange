@@ -1,11 +1,11 @@
-const http = require("http");
-const app = require("./app");
-const server = http.createServer(app);
+require("dotenv").config();
+require("./config/database").connect();
+const express = require("express");
 
-const { API_PORT } = process.env;
-const port = process.env.PORT || API_PORT;
+const app = express();
 
-// server listening 
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.use(express.json());
+
+// Logic here
+
+module.exports = app;

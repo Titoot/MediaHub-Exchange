@@ -1,11 +1,11 @@
-require("dotenv").config();
-require("./config/database").connect();
-const express = require("express");
+const http = require("http");
+const app = require("./index");
+const server = http.createServer(app);
 
-const app = express();
+const { API_PORT } = process.env;
+const port = process.env.PORT || API_PORT;
 
-app.use(express.json());
-
-// Logic here
-
-module.exports = app;
+// server listening 
+server.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
