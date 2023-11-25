@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+  <title><%= title %></title>
+  <link rel="shortcut icon" href="<%= favicon %>" type="image/x-icon" />
+  <script>
+    window.drive_names = JSON.parse('<%- folders %>');
+    window.MODEL = JSON.parse('<%- model %>');
+    window.current_drive_order = 0;
+    window.UI = JSON.parse('{"theme":"material","dark_mode":true,"title_include_drive_name":false,"title_include_path":"","hide_actions_tab":false,"hide_head_md":false,"hide_readme_md":false,"helpURL":"https://github.com/cheems/goindex-extended/","footer_text":"Made with <3","credits":false,"main_color":"blue-grey","accent_color":"blue"}');    
+
+  </script>
+  <script defer>
+        <%- spinner %>
+  </script>
+  <script src="//cdn.jsdelivr.net/gh/cheems/goindex-extended@4d1427558a21603e7c7e7dc986a154a9560f4835/app.js"></script>
+</head>
+<body>
+</body>
+</html>
