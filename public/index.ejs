@@ -1,22 +1,324 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
-  <title><%= title %></title>
-  <link rel="shortcut icon" href="<%= favicon %>" type="image/x-icon" />
-  <script>
-    window.drive_names = JSON.parse('<%- folders %>');
-    window.MODEL = JSON.parse('<%- model %>');
-    window.current_drive_order = 0;
-    window.UI = JSON.parse('{"theme":"material","dark_mode":true,"title_include_drive_name":false,"title_include_path":"","hide_actions_tab":false,"hide_head_md":false,"hide_readme_md":false,"helpURL":"https://github.com/cheems/goindex-extended/","footer_text":"Made with <3","credits":false,"main_color":"blue-grey","accent_color":"blue"}');    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Explorer</title>
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="./css/info.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+          line-height: 1.15;
+          -webkit-text-size-adjust: 100%;
+          color-scheme: dark;
+          --balloon-color: rgba(16,16,16,0.95);
+          --balloon-font-size: 12px;
+          --balloon-move: 4px;
+          margin: 0;
+          font-family: Roboto,Noto,Helvetica,Arial,sans-serif;
+          font-size: 15px;
+          color: rgba(255,255,255,.87);
+          background-color: #1E252F;
+          counter-reset: katexEqnNo mmlEqnNo;
+          transition: padding .3s cubic-bezier(0,0,.2,1);
+        }
+        #folders-container {
+          max-width: 980px;
+          padding-right: 8px;
+          padding-left: 8px;
+          margin-right: auto;
+          margin-left: auto;
+        }
 
-  </script>
-  <script defer>
-        <%- spinner %>
-  </script>
-  <script src="//cdn.jsdelivr.net/gh/cheems/goindex-extended@4d1427558a21603e7c7e7dc986a154a9560f4835/app.js"></script>
+        .tool-bar {
+          display: flex;
+          box-sizing: border-box;
+          align-items: center;
+          height: 56px;
+          line-height: 56px;
+          margin: 20px -8px 0 !important;
+          padding: 15px !important;
+          border-radius: 5px;
+          margin-top: 30px !important;
+          background-color: #ffffff0d!important;
+          box-shadow: 0 0.2em 1em rgb(0 0 0 / 30%)!important
+        }
+        .folder-list {
+          background-color: #ffffff0d!important;
+          box-shadow: 0 0.2em 1em rgb(0 0 0 / 30%)!important;
+          margin: 20px -8px 0 !important;
+          padding: 15px !important;
+          border-radius: 5px;
+        }
+        .toolbar-spacer {
+          margin: 0;
+          flex-grow: 1;
+        }
+        .search-bar {
+          position: relative;
+          min-height: 36px;
+          transition: width .3s cubic-bezier(.4,0,.2,1);
+          width: 36px;
+          max-width: 400px;
+        }
+        .search-button {
+          top: 4%;
+          background: 0 0;
+          border: none;
+          transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+          min-width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          position: absolute;
+        }
+
+        .search-button:hover {
+          background-color: rgba(0,0,0,.1)
+        }
+        .info-button:hover {
+          background-color: rgba(0,0,0,.1)
+        }
+        .search-icon {
+          bottom: 0;
+          padding: 0;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 24px;
+          line-height: 24px;
+          transform: translate(-12px,-12px);
+          color: inherit;
+          vertical-align: middle;
+        }
+        .info-button {
+        position: relative;
+        background: 0 0;
+        border: none;
+        transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+        min-width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        }
+        .item-row {
+          margin-right: -8px;
+          margin-left: -8px;
+        }
+        .list {
+          padding: 0;
+          margin: 0;
+          list-style: none;
+        }
+
+        .th {
+          background-color: #29303a;
+        }
+        .list-item {
+          border-radius: 5px;
+          padding: 0 10px 0 5px !important;
+          margin-bottom: 10px !important;
+          transition: none;
+          border: 1px solid rgb(255 255 255 / 10%)!important;
+          align-items: center;
+          display: flex;
+          min-height: 48px;
+          box-sizing: border-box;
+          cursor: pointer; /* remove when adding clickable sorting */
+        }
+        
+        .list-item>a {
+          width: 100%;
+          line-height: 3pc;
+        }
+
+
+        .list-item:not(.nohover):hover {
+          background-color: rgba(0,0,0,.08);
+        }
+
+        .baritem-1 {
+          position: relative;
+          min-height: 1px;
+          box-sizing: border-box;
+          padding-right: 8px;
+          padding-left: 8px;
+          float: left;
+          width: 58.333333%;
+        }
+
+        .baritem-2 {
+          position: relative;
+          min-height: 1px;
+          box-sizing: border-box;
+          padding-right: 8px;
+          padding-left: 8px;
+          float: left;
+          width: 25%;
+          text-align: right!important;
+        }
+
+        .baritem-3 {
+          position: relative;
+          min-height: 1px;
+          box-sizing: border-box;
+          padding-right: 8px;
+          padding-left: 8px;
+          float: left;
+          width: 16.666667%;
+          text-align: center!important;
+        }
+
+        .icon {
+          vertical-align: middle;
+        }
+
+        .file {
+          position: relative;
+    overflow: hidden;
+        }
+        .list a {
+        color: inherit;
+        text-decoration: none;
+        }
+
+        .textfield-input {
+          display: block;
+          height: 36px;
+          box-sizing: border-box;
+          padding: 8px 0;
+          font-family: inherit;
+          font-size: 16px;
+          background: 0 0;
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,.55);
+          transition-timing-function: cubic-bezier(.4,0,.2,1);
+          transition-duration: .2s;
+          transition-property: border-bottom-color,padding-right,box-shadow,-webkit-box-shadow;
+          width: calc(100% - 36px);
+          margin-left: 36px;
+        }
+
+        .textfield-close {
+          position: absolute;
+          top: 0;
+          right: 0;
+          transform: scale(0);
+
+        }
+        #search_bar_form {
+          display: none;
+        }
+    </style>
 </head>
 <body>
+    <div id="folders-container">
+    <div class="tool-bar">Sharing Site
+      <div class="toolbar-spacer"></div>
+      <div class="search-bar">
+        <button class="search-button" onclick="$('#close-button').css('transform', 'scale(1)'); $('.search-bar').css('width', '100%');$('#search_bar_form').css('display', 'block');">
+          <i class="search-icon material-icons">search</i>
+        </button>
+        <form id="search_bar_form" method="get" action="/search">
+          <input class="textfield-input" type="text" name="q" placeholder="Search in current folder" value="">
+        </form>
+        <button id="close-button" class="textfield-close info-button" onclick="$('#close-button').css('transform', 'scale(0)'); $('.search-bar').css('width', '36px');$('#search_bar_form').css('display', 'none');"><i class="mdui-icon material-icons">close</i></button>
+      </div>
+      <button class="info-button" onclick="console.log('button pressed');">
+        <i class="search-icon material-icons">help_outline</i>
+      </button>
+    </div>
+    
+    </div>
+
+    <div id="folders-container">
+      <div class="folder-list">
+        <div class="item-row">
+          <ul class="list">
+            <li class="list-item nohover">
+              <div class="baritem-1">
+                File
+                <i class="icon material-icons icon-sort" data-sort="name" data-order="more">expand_more</i>
+              </div>
+              <div class="baritem-2">
+                Date Modified
+                <i class="icon material-icons icon-sort" data-sort="name" data-order="more">expand_more</i>
+              </div>
+              <div class="baritem-3">
+                Size
+                <i class="icon material-icons icon-sort" data-sort="name" data-order="more">expand_more</i>
+              </div>
+              <div class="baritem-3">
+                Actions
+                <i class="icon material-icons icon-sort" data-sort="name" data-order="more">expand_more</i>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="item-row">
+          <ul class="list">
+            <% folders.forEach(function(folder) { %>
+              <%- folder %>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="info-container">
+      <div class="info-content">
+        <div class="info-title"><span>test</span></div>
+        <button class="close-button material-icons" onclick="$('#info-container').css('display', 'none');">close</button>
+        <div class="divider"></div>
+        <img class="card-image" src="https://cdn.akamai.steamstatic.com/steam/apps/409160/header.jpg" alt="Card Image">
+        <div class="text-content">
+          <p>A 15 minute heist game by Crows Crows Crows & Directed by William Pugh (The Stanley Parable). Slip into the soft-soled shoes of the mastermind responsible for the greatest heist- oh god I can’t do this any more, i’m joining the strike. good luck writing the steam description. -tina</p>
+          <b>Steam ID: </b> 1337
+          <br>
+          <b>Steam URL: </b> http://sex
+          <br>
+          <b>Size: </b> 69GB
+          <br>
+          <b>User PickUp Location: </b> nasr city
+        </div>
+      </div>
+
+      <script>
+        $(document).ready(function() {
+            var mousePosition;
+            var offset = [0,0];
+            var div;
+            var isDown = false;
+    
+            div = $("#info-container")
+    
+            div.on('mousedown', function(e) {
+                isDown = true;
+                offset = [
+                    div.offset().left - e.clientX,
+                    div.offset().top - e.clientY
+                ];
+            });
+    
+            $(document).on('mouseup', function() {
+                isDown = false;
+            });
+    
+            $(document).on('mousemove', function(event) {
+                event.preventDefault();
+                if (isDown) {
+                    mousePosition = {
+                        x: event.clientX,
+                        y: event.clientY
+                    };
+                    div.css({
+                        left: (mousePosition.x + offset[0]) + 'px',
+                        right: 'auto',
+                        top: (mousePosition.y + offset[1]) + 'px'
+                    });
+                }
+            });
+        });
+    </script>
+    </div>
+
 </body>
 </html>
