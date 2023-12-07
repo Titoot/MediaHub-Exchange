@@ -117,6 +117,10 @@ async function insertFiles(Name, Size, Date, userLocation) {
 
 function getSteamId(name)
 {
+  if (!fs.existsSync("./localSteamIds.json")) {
+    utils.updateSteamIds()
+    return getSteamId(name)
+  }
   const SteamIds = JSON.parse(fs.readFileSync("./localSteamIds.json").toString()).applist.apps
   const dataLength = Object.keys(SteamIds).length
   for(var i = 0; i < dataLength; i++) {
