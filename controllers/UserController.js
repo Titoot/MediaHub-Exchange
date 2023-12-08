@@ -8,7 +8,7 @@ exports.Login = async (req, res) => {
       const { username, password } = req.body;
   
       if (!(username && password)) {
-        return res.status(400).send("All input is required");
+        return res.status(400).json({success: false, message: "All Field Inputs Are Required"});
       }
   
       const user = await User.findOne({ username });
@@ -17,7 +17,10 @@ exports.Login = async (req, res) => {
         // Create token
         const token = jwt.sign(
           { userId: user._id },
-          process.env.TOKEN_KEY
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "7d",
+          }
         );
   
         return res
@@ -26,9 +29,9 @@ exports.Login = async (req, res) => {
                     secure: process.env.NODE_ENV === "production",
                 })
                 .status(200)
-                .json({ message: "Logged in successfully 😊 👌" })
+                .json({ success: true, message: "Logged in successfully 😊 👌" })
       }
-      return res.status(400).send("Invalid Credentials");
+      return res.status(400).json({success: false, message: "Invalid Credentials"});
   }catch(err)
   {
     console.log(err);
@@ -42,21 +45,21 @@ exports.Register = async (req, res) => {
     
         // Validate user input
         if (!(username && password)) {
-          return res.status(400).send("All input is required");
+          return res.status(400).json({success: false, message:"All input is required"});
         }
         // check if user already exist
         // Validate if user exist in our database
         const oldUser = await User.findOne({ username });
     
         if (oldUser) {
-          return res.status(409).send("User Already Exist. Please Login");
+          return res.status(409).json({success: false, message:"User Already Exist. Please Login"});
         }
 
         let folder = await Folder.findOne({name: username})
 
         if(folder)
         {
-            return res.status(409).send("Folder Already Exists.")
+            return res.status(409).json({success: false, message:"Folder Already Exists."})
         }
 
         folder = await Folder.create({
@@ -88,8 +91,42 @@ exports.Register = async (req, res) => {
                     secure: process.env.NODE_ENV === "production",
                 })
                 .status(200)
-                .json({ message: "Account created successfully 😊 👌" })
+                .json({ success: true, message: "Account created successfully 😊 👌" })
       } catch (err) {
         console.log(err);
       }
 };
+
+exports.isLoggedIn = (req, res, next) => {
+    const token = req.cookies.access_token;
+    if (!token)
+    {
+        res.locals.isLoggedIn = false;
+        next()
+        return
+    }
+
+    if(!jwt.verify(token, process.env.TOKEN_KEY))
+    {
+        res.locals.isLoggedIn = false;
+        next()
+        return
+    }
+
+    res.locals.isLoggedIn = true;
+    next()
+}
+
+exports.isLoggedInF = (token)  => {
+    if (!token)
+    {
+        return false;
+    }
+
+    if(!jwt.verify(token, process.env.TOKEN_KEY))
+    {
+        return false;
+    }
+
+    return true;
+}
