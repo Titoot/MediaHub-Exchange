@@ -81,13 +81,14 @@ app.get('/:folderName/:subFolderName', async (req, res) => {
 
 async function insertFolder(folderId, isSubFolder=false, MainFolder=null) {
   const folder = isSubFolder ? await Folder.Subfolder.findById(folderId) : folderId
-  var name = isSubFolder ? path.join(MainFolder, folder.name) : folder.name
+  const name = isSubFolder ? path.join(MainFolder, folder.name) : folder.name
+  const icon = isSubFolder ? 'folder' : 'person'
   // if MainFolder get user location
   return `
   <li class="list-item">
               <a gd-type="application/pdf" href="/${name}">
                 <div class="baritem-1" title="${folder.name}">
-                  <i class="icon material-icons">folder</i>
+                  <i class="icon material-icons">${icon}</i>
                   ${folder.name}
                 </div>
                 <div class="baritem-2">${utils.formatDate(folder.modifiedAt)}</div>
