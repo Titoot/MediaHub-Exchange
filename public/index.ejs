@@ -265,19 +265,19 @@
     </div>
     <div id="info-container">
       <div class="info-content">
-        <div class="info-title"><span>test</span></div>
+        <div class="info-title"><span></span></div>
         <button class="close-button material-icons" onclick="$('#info-container').css('display', 'none');">close</button>
         <div class="divider"></div>
-        <img class="card-image" src="https://cdn.akamai.steamstatic.com/steam/apps/409160/header.jpg" alt="Card Image">
+        <img class="card-image" src="" alt="Card Image">
         <div class="text-content">
-          <p>A 15 minute heist game by Crows Crows Crows & Directed by William Pugh (The Stanley Parable). Slip into the soft-soled shoes of the mastermind responsible for the greatest heist- oh god I can’t do this any more, i’m joining the strike. good luck writing the steam description. -tina</p>
-          <b>Steam ID: </b> 1337
+          <p></p>
+          <b>Steam ID: </b><span id="steam-id"></span>
           <br>
-          <b>Steam URL: </b> http://sex
+          <b>Steam URL: </b><a id="steam-url" href="" target="_blank"></span>
           <br>
-          <b>Size: </b> 69GB
+          <b>Size: </b><span id="size"></span>
           <br>
-          <b>User PickUp Location: </b> nasr city
+          <b>User PickUp Location: </b><span id="user-location"></span>
         </div>
       </div>
 
@@ -319,11 +319,17 @@
         });
     </script>
     <script>
-      function showInfo(name, description, image) {
+      function showInfo(name, description, image, steamid, size, userLocation) {
         $('#info-container').css('display', 'block');
         $('.info-title').text(name);
         $('.text-content p').text(description);
         $('.card-image').attr('src', image);
+
+        $("#steam-id").text(steamid);
+        $("#steam-url").text(`https://store.steampowered.com/app/${steamid}/`);
+        $("#steam-url").attr('href',`https://store.steampowered.com/app/${steamid}/`);
+        $("#size").text(size);
+        $("#user-location").text(userLocation);
       }
     </script>
     </div>

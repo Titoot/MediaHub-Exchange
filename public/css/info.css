@@ -62,4 +62,5 @@
   .text-content {
 
     line-height: 25px;
+    line-break: anywhere;
   }
