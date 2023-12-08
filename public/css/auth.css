@@ -65,7 +65,8 @@
 
 
 .login-form{
-    height: 400px;
+    min-height: 400px;
+    height: auto;
     width: 400px;
     position: fixed;
     transform: translate(-50%,-50%);
@@ -126,7 +127,8 @@
 /* signup form */
 
 .signup-form{
-    height: 400px;
+    min-height: 400px;
+    height: auto;
     width: 400px;
     position: fixed;
     transform: translate(-50%,-50%);
@@ -182,4 +184,25 @@
     font-weight: 600;
     border-radius: 5px;
     cursor: pointer;
+}
+
+
+.error-message {
+    display: none;
+    margin-top: 10px;
+    background-color: #d76961;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    margin-left: 20px;
+}
+
+.success-message {
+    display: none;
+    margin-top: 10px;
+    background-color: #4BB543;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    margin-left: 20px;
 }

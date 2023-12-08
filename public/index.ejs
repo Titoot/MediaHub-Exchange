@@ -212,6 +212,11 @@
     </style>
 </head>
 <body>
+  <% if (isLoggedIn) { %>
+    <p>Welcome, you are logged in!</p>
+  <% } else { %>
+    <p>Please log in to access this page.</p>
+  <% } %>
     <div id="folders-container">
     <div class="tool-bar">MediaHub Exchange
       <div class="toolbar-spacer"></div>
@@ -343,7 +348,10 @@
         <form class="login-form">
           <button class="close-button material-icons" onclick="$('.login-form').slideToggle();" type="button">close</button>
           <h3>Login</h3>
-  
+
+          <div class="error-message"></div>
+          <div class="success-message"></div>
+
           <label for="username">Username</label>
           <input type="text" placeholder="Username" id="username">
   
@@ -358,6 +366,9 @@
         <button class="close-button material-icons" onclick="$('.signup-form').slideToggle();" type="button">close</button>
         <h3>Register</h3>
 
+        <div class="error-message"></div>
+        <div class="success-message"></div>
+
         <label for="username">Username</label>
         <input type="text" placeholder="Username" id="username">
 
@@ -370,6 +381,7 @@
     <script>
         let loginForm = $(".login-form");
         loginForm.on("submit", (e) => {
+          e.preventDefault();
           const username = $(".login-form input#username").val();
           const password = $(".login-form input#password").val();
 
@@ -380,12 +392,34 @@
             },
             body: JSON.stringify({ username: username, password: password }),
           })
-            .then((r) => r.json())
-            .then((data) => console.log(data));
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+              const successMessage = $(".login-form .success-message");
+              successMessage.text(data.message);
+              successMessage.slideToggle();
+              setTimeout(200)
+              location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".login-form .error-message");
+                errorMessage.text(`An error occurred during login. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during login:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".login-form .error-message");
+              errorMessage.text("An error occurred during login. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during login:", error);
+            });
         });
 
         let signupForm = $(".signup-form");
         signupForm.on("submit", (e) => {
+          e.preventDefault();
           const username = $(".signup-form input#username").val();
           const password = $(".signup-form input#password").val();
 
@@ -396,8 +430,29 @@
             },
             body: JSON.stringify({ username: username, password: password }),
           })
-            .then((r) => r.json())
-            .then((data) => console.log(data));
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+                const successMessage = $(".signup-form .success-message");
+                successMessage.text(data.message);
+                successMessage.slideToggle();
+                setTimeout(200)
+                location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".signup-form .error-message");
+                errorMessage.text(`An error occurred during signup. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during signup:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".signup-form .error-message");
+              errorMessage.text("An error occurred during signup. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during signup:", error);
+            });
         });
     </script>
       </div>
