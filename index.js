@@ -1,7 +1,9 @@
 require("dotenv").config();
 require("./config/database").connect();
 const Folder = require("./model/folders");
+const Type = require("./model/type");
 const utils = require("./utils")
+const steam = require("./fileParsing/steam")
 const express = require("express");
 const axios = require('axios');
 const path = require('path');
@@ -16,30 +18,36 @@ app.set('views', path.join(__dirname, './public'))
 app.get('/', async (req, res) => {
     //await CreateFolder()
     var folders = []
-    await Folder.findOne({name: "Titoot"}).then(function (folder) {
-      console.log(folder.name)
-      folders.push(insertFolder(folder.name, utils.formatDate(new Date())))
-      });
+    const folder = await Folder.Folder.find({})
+    if(folder)
+    {
+      var folders = await Promise.all(
+        folder.map(async (folderId) => {
+          return await insertFolder(folderId)
+        })
+      );
+    }
     res.render('index', {folders: folders});
   });
 
 app.get('/:folderName', async (req, res) => {
   var folderName = req.params.folderName
-  const folder = await Folder.findOne({name: folderName})
+  const folder = await Folder.Folder.findOne({name: folderName})
   if(!folder)
   {
     res.status(404).send("Folder Not Found");
     return;
   }
-  var folders = []
-  folder.subfolders.forEach(folder => {
-    folders.push(insertFolder(folder.name, utils.formatDate(new Date()), true, folderName))
-  });
+  var folders = await Promise.all(
+    folder.subfolders.map(async (folderId) => {
+      return await insertFolder(folderId, true, folderName)
+    })
+  );
 
   var files = []
   var files = await Promise.all(
     folder.files.map(async (file) => {
-      return await insertFiles(file.name, '69GB', utils.formatDate(new Date()), '1931770');
+      return await insertFiles(file);
     })
   );
 
@@ -50,18 +58,20 @@ app.get('/:folderName', async (req, res) => {
 })
 
 app.get('/:folderName/:subFolderName', async (req, res) => {
-  var folderName = req.params.folderName
   var subFolderName = req.params.subFolderName
-  const folder = await Folder.findOne({name: folderName})
-  if(!folder)
+  const subfolder = await Folder.Subfolder.findOne({name: subFolderName})
+  if(!subfolder)
   {
     res.status(404).send("Folder Not Found");
     return;
   }
+
   var filesArray = []
   var filesArray = await Promise.all(
-    folder.subfolders[0].files.map(async (file) => {
-      return insertFiles(file.name, '69GB', utils.formatDate(new Date()), '1931770');
+    subfolder.files.map(async (file) => {
+      const fileDetails = await Folder.File.findById(file);
+      
+      return insertFiles(fileDetails, utils.formatDate(subfolder.modifiedAt));
     })
   );
 
@@ -69,16 +79,18 @@ app.get('/:folderName/:subFolderName', async (req, res) => {
 
 })
 
-function insertFolder(Name, Date, isSubFolder=false, MainFolder=null) {
-  var name = isSubFolder ? path.join(MainFolder, Name) : Name
+async function insertFolder(folderId, isSubFolder=false, MainFolder=null) {
+  const folder = isSubFolder ? await Folder.Subfolder.findById(folderId) : folderId
+  var name = isSubFolder ? path.join(MainFolder, folder.name) : folder.name
+  // if MainFolder get user location
   return `
   <li class="list-item">
               <a gd-type="application/pdf" href="/${name}">
-                <div class="baritem-1" title="${Name}">
+                <div class="baritem-1" title="${folder.name}">
                   <i class="icon material-icons">folder</i>
-                  ${Name}
+                  ${folder.name}
                 </div>
-                <div class="baritem-2">${Date}</div>
+                <div class="baritem-2">${utils.formatDate(folder.modifiedAt)}</div>
                 <div class="baritem-3">-</div>
               </a>
               <div class="baritem-3">
@@ -87,73 +99,138 @@ function insertFolder(Name, Date, isSubFolder=false, MainFolder=null) {
             </li>
   `
 }
-async function insertFiles(Name, Size, Date, userLocation) {
-  const steamId = getSteamId(Name)
-  steamUrl = `https://store.steampowered.com/api/appdetails?appids=${steamId}`
-
-  const res = await axios({
-    method: 'get',
-    url: steamUrl
-    });
-  const gameData = res.data[steamId].data
-  return `
-  <li class="list-item">
-              <a gd-type="application/pdf" onclick="$('#info-container').css('display', 'block');$('.info-title').text('${gameData.name}'); $('.text-content p').text('${gameData.short_description}'); $('.card-image').attr('src', '${gameData.header_image}');">
-                <div class="baritem-1" title="${Name}">
-                  <i class="icon material-icons">insert_drive_file</i>
-                  ${gameData.name}
-                </div>
-                <div class="baritem-2">${Date}</div>
-                <div class="baritem-3">${Size}</div>
-              </a>
-              <div class="baritem-3">
-                <button class="info-button" onclick="$('#info-container').css('display', 'block');$('.info-title').text('${gameData.name}'); $('.text-content p').text('${gameData.short_description}'); $('.card-image').attr('src', '${gameData.header_image}');">
-                  <i class="icon material-icons">info_outline</i>
-                </button>
-              </div>
-            </li>
-  `
+async function insertFiles(file) {
+  const fileType = file.typeModel
+  const contentDetails = await getContentDetails(fileType, file.contentDetails)
+  //const steamId = getSteamId(Name)
+  return await generateFileListItem(file, fileType, contentDetails)
 }
 
-function getSteamId(name)
+async function generateFileListItem(file, fileType, contentDetails) {
+  const commonAttributes = `
+    <div class="baritem-1" title="${file.name}">
+      <i class="icon material-icons">insert_drive_file</i>
+      ${file.name}
+    </div>
+    <div class="baritem-2">${file.modifiedDate}</div>
+    <div class="baritem-3">${file.size}</div>
+  `;
+
+  switch (fileType) {
+    case 'Game':
+      if(contentDetails.steamid == null)
+      {
+        const steamId = await steam.getSteamId(file.name)
+        steamUrl = `https://store.steampowered.com/api/appdetails?appids=${steamId}`
+
+        const res = await axios({
+          method: 'get',
+          url: steamUrl
+          });
+        const steamData = res.data[steamId].data
+        await file.updateOne({ name: steamData.name, modifiedAt: Date.now})
+        await contentDetails.updateOne({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description})
+      }
+
+      const gameData = contentDetails;
+      return `
+        <li class="list-item">
+          <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
+            ${commonAttributes}
+          </a>
+          <div class="baritem-3">
+            <button class="info-button" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
+              <i class="icon material-icons">info_outline</i>
+            </button>
+          </div>
+        </li>
+      `;
+    case 'Movie':
+      const movieData = contentDetails; // Assuming movieData is available
+      return `
+        <li class="list-item">
+          <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
+            ${commonAttributes}
+          </a>
+          <div class="baritem-3">
+            <button class="info-button" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
+              <i class="icon material-icons">info_outline</i>
+            </button>
+          </div>
+        </li>
+      `;
+    // Add more cases for other file types as needed
+    default:
+      return ''; // Handle unsupported file types
+  }
+}
+
+async function getContentDetails(fileType, contentDetailsId)
 {
-  const SteamIds = JSON.parse(fs.readFileSync("./localSteamIds.json").toString()).applist.apps
-  const dataLength = Object.keys(SteamIds).length
-  for(var i = 0; i < dataLength; i++) {
-    var id = SteamIds[i].name.toLowerCase().replace(/[^\x20-\x7E]/g, '').replace(':', '')
-    const forbidArray = ['dlc', 'add-on', 'season pass', 'pack', 'Soundtrack', 'demo']
-    const checker = forbidArray.some(v => id.includes(v))
 
-    if(checker)
-    {
-      continue
-    }
+switch (fileType) {
+  case 'Game':
+    return await Type.Game.findById(contentDetailsId);
 
-    if (id.includes(name.toLowerCase())){
-        return SteamIds[i].appid;
-    }
+  case 'Movie':
+    return await Type.Movie.findById(contentDetailsId);
+
+  case 'Series':
+    return await Type.Series.findById(contentDetailsId);
+
+  case 'Anime':
+    return await Type.Anime.findById(contentDetailsId);
+
+  default:
+    // Handle the default case or raise an error
+    throw new Error('Invalid file type');
 }
-return -1;
+
 }
 
 async function CreateFolder()
 {
-  const folder = await Folder.create({
-    name: 'Titoot',
-    files: [
-      { name: 'Horizon Zero Dawn', content: 'This is the content of file1.txt' },
-      { name: 'Batman', content: 'This is the content of file2.txt' }
-    ],
-    subfolders: [
-      {
-        name: 'Movies',
-        files: [
-          { name: 'sex', content: 'This is the content of sex' }
-        ]
-      }
-    ]
+  const gameFile = await Folder.File.create({
+    name: 'Game File',
+    content: 'Game Content',
+    typeModel: 'Game',
+    contentDetails: await Type.Game.create({
+      steamid: '123',
+      genre: 'Action',
+      headerImage: 'game-image.jpg',
+      description: 'Game Description',
+    }),
   });
-  console.log(folder)
+
+  const movieFile = await Folder.File.create({
+    name: 'Movie File',
+    content: 'Movie Content',
+    typeModel: 'Movie',
+    contentDetails: await Type.Movie.create({
+      genre: 'Drama',
+      headerImage: 'movie-image.jpg',
+      description: 'Movie Description',
+    }),
+  });
+
+  // Create subfolders
+  const subfolder1 = await Folder.Subfolder.create({
+    name: 'Subfolder 1',
+    files: [gameFile._id],
+  });
+
+  const subfolder2 = await Folder.Subfolder.create({
+    name: 'Subfolder 2',
+    files: [movieFile._id],
+  });
+
+  // Create the main folder with subfolders
+  const mainFolder = await Folder.Folder.create({
+    name: 'Main Folder',
+    subfolders: [subfolder1._id, subfolder2._id],
+  });
+
+  console.log('Folder Structure Created:', mainFolder);
 }
 
 app.set('view engine', 'ejs');
