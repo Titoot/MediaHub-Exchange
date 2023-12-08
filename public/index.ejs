@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Explorer</title>
+    <title>MediaHub Exchange File Explorer</title>
     <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="/css/info.css">
+    <link rel="stylesheet" href="/css/auth.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
         body {
@@ -212,7 +213,7 @@
 </head>
 <body>
     <div id="folders-container">
-    <div class="tool-bar">Sharing Site
+    <div class="tool-bar">MediaHub Exchange
       <div class="toolbar-spacer"></div>
       <div class="search-bar">
         <button class="search-button" onclick="$('#close-button').css('transform', 'scale(1)'); $('.search-bar').css('width', '100%');$('#search_bar_form').css('display', 'block');">
@@ -266,7 +267,7 @@
     <div id="info-container">
       <div class="info-content">
         <div class="info-title"><span></span></div>
-        <button class="close-button material-icons" onclick="$('#info-container').css('display', 'none');">close</button>
+        <button class="close-button material-icons" onclick="$('#info-container').slideToggle();">close</button>
         <div class="divider"></div>
         <img class="card-image" src="" alt="Card Image">
         <div class="text-content">
@@ -320,7 +321,7 @@
     </script>
     <script>
       function showInfo(name, description, image, steamid, size, userLocation) {
-        $('#info-container').css('display', 'block');
+        $('#info-container').slideToggle();;
         $('.info-title').text(name);
         $('.text-content p').text(description);
         $('.card-image').attr('src', image);
@@ -332,6 +333,74 @@
         $("#user-location").text(userLocation);
       }
     </script>
+    </div>
+    <div id="auth-container">
+      <div class="auth-bar">
+        <button class="signin-button material-icons" onclick="$('.signin-form').slideToggle(); $('.login-form').css('display', 'none');">account_circle</button>
+        <div class="toolbar-spacer"></div>
+        <button class="login-button material-icons" onclick="$('.login-form').slideToggle(); $('.signin-form').css('display', 'none');">login</button>
+
+        <form class="login-form">
+          <button class="close-button material-icons" onclick="$('.login-form').slideToggle();" type="button">close</button>
+          <h3>Login</h3>
+  
+          <label for="username">Username</label>
+          <input type="text" placeholder="Username" id="username">
+  
+          <label for="password">Password</label>
+          <input type="password" placeholder="Password" id="password">
+  
+          <button class="submit-button">Log In</button>
+          </div>
+      </form>
+      <div>
+      <form class="signin-form">
+        <button class="close-button material-icons" onclick="$('.signin-form').slideToggle();" type="button">close</button>
+        <h3>Register</h3>
+
+        <label for="username">Username</label>
+        <input type="text" placeholder="Username" id="username">
+
+        <label for="password">Password</label>
+        <input type="password" placeholder="Password" id="password">
+
+        <button class="submit-button">Sign In</button>
+        </div>
+    </form>
+    <script>
+        let loginForm = $(".login-form");
+        loginForm.on("submit", (e) => {
+          const username = $(".login-form input#username").val();
+          const password = $(".login-form input#password").val();
+
+          fetch('/login', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: username, password: password }),
+          })
+            .then((r) => r.json())
+            .then((data) => console.log(data));
+        });
+
+        let signinForm = $(".signin-form");
+        signinForm.on("submit", (e) => {
+          const username = $(".signin-form input#username").val();
+          const password = $(".signin-form input#password").val();
+
+          fetch('/signin', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: username, password: password }),
+          })
+            .then((r) => r.json())
+            .then((data) => console.log(data));
+        });
+    </script>
+      </div>
     </div>
 
 </body>
