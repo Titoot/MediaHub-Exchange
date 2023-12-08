@@ -112,6 +112,7 @@
 
 .login-form .submit-button{
     margin-top: 50px;
+    margin-left: 10px;
     width: 100%;
     background-color: #ffffff;
     color: #080710;
@@ -172,6 +173,7 @@
 
 .signin-form .submit-button{
     margin-top: 50px;
+    margin-left: 10px;
     width: 100%;
     background-color: #ffffff;
     color: #080710;
