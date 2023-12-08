@@ -4,7 +4,9 @@ const Folder = require("./model/folders");
 const Type = require("./model/type");
 const utils = require("./utils")
 const steam = require("./fileParsing/steam")
+const UserController = require("./controllers/UserController")
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
@@ -14,6 +16,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.set('views', path.join(__dirname, './public'))
+app.use(cookieParser());
+
+app.post('/login', UserController.Login)
+app.post('/signin', UserController.Register)
 
 app.get('/', async (req, res) => {
     //await CreateFolder()
