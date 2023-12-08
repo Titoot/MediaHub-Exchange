@@ -39,7 +39,7 @@
     color: rgba(255, 255, 255, .87);
     align-items: center;
   }
-  .signin-button {
+  .signup-button {
     position: relative;
     cursor: pointer;
     background: none;
@@ -56,7 +56,7 @@
     background-color: rgba(0,0,0,.1)
   }
 
-  .signin-button:hover {
+  .signup-button:hover {
     background-color: rgba(0,0,0,.1)
   }
 
@@ -123,9 +123,9 @@
     cursor: pointer;
 }
 
-/* signin form */
+/* signup form */
 
-.signin-form{
+.signup-form{
     height: 400px;
     width: 400px;
     position: fixed;
@@ -140,12 +140,12 @@
     display: none;
     background-color: #29303a!important;
 }
-.signin-form *{
+.signup-form *{
     letter-spacing: 0.5px;
     outline: none;
     border: none;
 }
-.signin-form h3{
+.signup-form h3{
     font-size: 32px;
     font-weight: 500;
     line-height: 42px;
@@ -153,13 +153,13 @@
     padding-left: 20px;
 }
 
-.signin-form label{
+.signup-form label{
     display: block;
     margin-top: 30px;
     font-size: 16px;
     font-weight: 500;
 }
-.signin-form input{
+.signup-form input{
     display: block;
     height: 50px;
     width: 100%;
@@ -171,7 +171,7 @@
     font-weight: 300;
 }
 
-.signin-form .submit-button{
+.signup-form .submit-button{
     margin-top: 50px;
     margin-left: 10px;
     width: 100%;

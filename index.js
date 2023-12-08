@@ -19,7 +19,7 @@ app.set('views', path.join(__dirname, './public'))
 app.use(cookieParser());
 
 app.post('/login', UserController.Login)
-app.post('/signin', UserController.Register)
+app.post('/signup', UserController.Register)
 
 app.get('/', async (req, res) => {
     //await CreateFolder()

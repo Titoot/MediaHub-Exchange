@@ -336,9 +336,9 @@
     </div>
     <div id="auth-container">
       <div class="auth-bar">
-        <button class="signin-button material-icons" onclick="$('.signin-form').slideToggle(); $('.login-form').css('display', 'none');">account_circle</button>
+        <button class="signup-button material-icons" onclick="$('.signup-form').slideToggle(); $('.login-form').css('display', 'none');">account_circle</button>
         <div class="toolbar-spacer"></div>
-        <button class="login-button material-icons" onclick="$('.login-form').slideToggle(); $('.signin-form').css('display', 'none');">login</button>
+        <button class="login-button material-icons" onclick="$('.login-form').slideToggle(); $('.signup-form').css('display', 'none');">login</button>
 
         <form class="login-form">
           <button class="close-button material-icons" onclick="$('.login-form').slideToggle();" type="button">close</button>
@@ -354,8 +354,8 @@
           </div>
       </form>
       <div>
-      <form class="signin-form">
-        <button class="close-button material-icons" onclick="$('.signin-form').slideToggle();" type="button">close</button>
+      <form class="signup-form">
+        <button class="close-button material-icons" onclick="$('.signup-form').slideToggle();" type="button">close</button>
         <h3>Register</h3>
 
         <label for="username">Username</label>
@@ -384,12 +384,12 @@
             .then((data) => console.log(data));
         });
 
-        let signinForm = $(".signin-form");
-        signinForm.on("submit", (e) => {
-          const username = $(".signin-form input#username").val();
-          const password = $(".signin-form input#password").val();
+        let signupForm = $(".signup-form");
+        signupForm.on("submit", (e) => {
+          const username = $(".signup-form input#username").val();
+          const password = $(".signup-form input#password").val();
 
-          fetch('/signin', {
+          fetch('/signup', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
