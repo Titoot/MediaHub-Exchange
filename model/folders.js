@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 const fileSchema = new mongoose.Schema({
-  name: {type: String, unique: true},
+  name: String,
   content: String,
+  path: String,
   size: { type: String, default: '-' },
   typeModel: {
     type: String,
@@ -19,7 +20,9 @@ const fileSchema = new mongoose.Schema({
 });
 
 const subfolderSchema = new mongoose.Schema({
-  name: {type: String, unique: true},
+  name: String,
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true },
+  path: String,
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File', // Reference to the File model
@@ -39,7 +42,6 @@ const Subfolder = mongoose.model('Subfolder', subfolderSchema);
 
 const folderSchema = new mongoose.Schema({
   name: {type: String, unique: true},
-  //Owner: { type: mongoose.Schema.Types.ObjectId, default: null },
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File',
