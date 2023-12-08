@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Explorer</title>
     <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
-    <link rel="stylesheet" href="./css/info.css">
+    <link rel="stylesheet" href="/css/info.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
         body {
@@ -317,6 +317,14 @@
                 }
             });
         });
+    </script>
+    <script>
+      function showInfo(name, description, image) {
+        $('#info-container').css('display', 'block');
+        $('.info-title').text(name);
+        $('.text-content p').text(description);
+        $('.card-image').attr('src', image);
+      }
     </script>
     </div>
 
