@@ -107,9 +107,10 @@ async function insertFiles(file) {
 }
 
 async function generateFileListItem(file, fileType, contentDetails) {
+  const fileIcon = setcommonAttributes(fileType)
   const commonAttributes = `
     <div class="baritem-1" title="${file.name}">
-      <i class="icon material-icons">insert_drive_file</i>
+      <i class="icon material-icons">${fileIcon}</i>
       ${file.name}
     </div>
     <div class="baritem-2">${file.modifiedDate}</div>
@@ -146,7 +147,7 @@ async function generateFileListItem(file, fileType, contentDetails) {
         </li>
       `;
     case 'Movie':
-      const movieData = contentDetails; // Assuming movieData is available
+      const movieData = contentDetails;
       return `
         <li class="list-item">
           <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
@@ -159,9 +160,27 @@ async function generateFileListItem(file, fileType, contentDetails) {
           </div>
         </li>
       `;
-    // Add more cases for other file types as needed
+
     default:
-      return ''; // Handle unsupported file types
+      throw new Error('Invalid file type');
+  }
+}
+
+function setcommonAttributes(fileType)
+{
+  switch (fileType) {
+    case 'Game':
+      return 'games'
+
+    case 'Movie':
+        return 'movie'
+    
+    case 'Series':
+          return 'live_tv'
+    case 'Anime':
+          return 'sick'
+    default:
+      throw new Error('Invalid file type');
   }
 }
 
@@ -182,7 +201,6 @@ switch (fileType) {
     return await Type.Anime.findById(contentDetailsId);
 
   default:
-    // Handle the default case or raise an error
     throw new Error('Invalid file type');
 }
 
