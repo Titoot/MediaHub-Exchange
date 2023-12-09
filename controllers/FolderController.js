@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path")
 const UserController = require("../controllers/UserController");
-const { Folder, Subfolder } = require("../model/folders");
+const { Folder, Subfolder, File } = require("../model/folders");
 const { User } = require("../model/user");
 const utils = require("../utils")
 
@@ -14,8 +14,8 @@ exports.CreateFolder = async (req, res) => {
     }
 
     const token = req.cookies.access_token;
-
-    if(!UserController.isLoggedInF(token))
+    const isLoggedIn = await UserController.isLoggedInF(token)
+    if(!isLoggedIn)
     {
         return res.status(401).json({ success: false, message: "User Unauthenticated" })
     }  
@@ -77,9 +77,73 @@ exports.CreateFolder = async (req, res) => {
         return res.status(201).json({ success: true, message: "Folder Created Successfully" })
 
     } catch(brr) {
+        console.error(brr)
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
           });
     }
+}
+
+exports.DeleteFolder = async (req, res) => {
+    const { FolderPath } = req.body;
+
+    if (!(FolderPath)) {
+        return res.status(400).json({success: false, message: "All Field Inputs Are Required"});
+    }
+
+    const token = req.cookies.access_token;
+    const isLoggedIn = await UserController.isLoggedInF(token)
+    if(!isLoggedIn)
+    {
+        return res.status(401).json({ success: false, message: "User Unauthenticated" })
+    }  
+
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+
+    const user = await User.findById(decoded.userId)
+
+    const NormalizedPath = new RegExp(utils.escapeRegExp(utils.pathNormalize(FolderPath)))
+
+    const subfoldersToDelete = await Subfolder.find({ owner: user._id, path: { $regex: NormalizedPath } }).select('_id');
+    const subfilesToDelete = await File.find({ owner: user._id, path: { $regex: NormalizedPath } }).select('_id');
+    
+    // Extract IDs from the result
+    const subfolderIds = subfoldersToDelete.map(subfolder => subfolder._id);
+    const subfileIds = subfilesToDelete.map(subfile => subfile._id);
+    
+    // Delete the documents using the IDs
+    const deletedSubfolders = await Subfolder.deleteMany({ _id: { $in: subfolderIds } });
+    const deletedSubfiles = await File.deleteMany({ _id: { $in: subfileIds } });
+
+    const mainFolder = await Folder.findById(user.OwnedFolder)
+
+    await mainFolder.updateOne({ $pullAll: { subfolders: subfolderIds, subfiles: subfileIds } });
+
+    return res.status(200).json({ success: true, message: "Folder recursively Deleted Sucessfully" })
+}
+
+exports.isOwned = async (req, res, next) => {
+    const token = req.cookies.access_token;
+    const isLoggedIn = await UserController.isLoggedInF(token);
+
+    if(!isLoggedIn)
+    {
+        res.locals.isOwned = false;
+        next()
+        return
+    }
+
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await User.findById(decoded.userId)
+
+    if(!req.path.includes(user.username))
+    {
+        res.locals.isOwned = false;
+        next()
+        return
+    }
+
+    res.locals.isOwned = true;
+    next()
 }
