@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/user.css">
     <link rel="stylesheet" href="/css/nav-bar.css">
+    <link rel="stylesheet" href="/css/prompt.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <style>
@@ -243,7 +244,7 @@
                 <button class="back-button material-icons" onclick="window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));">arrow_back</button>
                 <span class="nav-path">/zackaziko/sex</span>
                 <div class="toolbar-spacer"></div>
-                <button class="newfolder-button material-icons">create_new_folder</span>
+                <button class="newfolder-button material-icons" onclick="$('.newfolder-form').slideToggle();">create_new_folder</span>
                 <button class="newfile-button material-icons">note_add</span>
               </div>
               <script>
@@ -504,6 +505,59 @@
         });
     </script>
       </div>
+    <div id="prompt-container">
+      <form class="newfolder-form">
+        <button class="close-button material-icons" onclick="$('.newfolder-form').slideToggle();" type="button">close</button>
+        <h3>Create New Folder</h3>
+
+        <div class="error-message"></div>
+        <div class="success-message"></div>
+
+        <label for="foldername">Folder Name</label>
+        <input type="text" placeholder="New Folder Name" id="foldername">
+
+        <button class="submit-button">Create</button>
+        
+      </form>
+    <script>
+        let newfolderForm = $(".newfolder-form");
+        newfolderForm.on("submit", (e) => {
+          e.preventDefault();
+          const foldername = $(".newfolder-form input#foldername").val();
+
+          fetch('/createFolder', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ NewFolderName: foldername, FolderParentPath: location.pathname }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+              const successMessage = $(".newfolder-form .success-message");
+              successMessage.text(data.message);
+              successMessage.slideToggle();
+              setTimeout(200)
+              location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".newfolder-form .error-message");
+                errorMessage.text(`An error occurred during creating the folder. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during creating the folder:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".newfolder-form .error-message");
+              errorMessage.text("An error occurred during creating the folder. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during creating the folder:", error);
+            });
+        });
+    </script>
+    </div>
     </div>
 
 </body>
