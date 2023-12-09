@@ -27,6 +27,18 @@ exports.CreateFolder = async (req, res) => {
         const isMainFolder = user.username === FolderParentPath.slice(1);
         const ParentPath = utils.pathNormalize(path.join(FolderParentPath, NewFolderName))
         const NormalizedParentPath = utils.pathNormalize(FolderParentPath)
+
+        const existingFolder = await Subfolder.findOne({
+            owner: user._id,
+            path: ParentPath,
+        });
+      
+        if (existingFolder) {
+            return res.status(409).json({
+              success: false,
+              message: "Can't Create a Dublicate Folder In the Same Folder",
+            });
+        }
         
         if(isMainFolder)
         {
@@ -42,27 +54,15 @@ exports.CreateFolder = async (req, res) => {
             return res.status(201).json({ success: true, message: "Folder Created Successfully" })
         }
 
-        const existingFolder = await Subfolder.findOne({
-            owner: user._id,
-            path: ParentPath,
-        });
-      
-        if (existingFolder) {
-            return res.status(409).json({
-              success: true,
-              message: "Can't Create Dublicate Folders In the Same Folder",
-            });
-        }
-
         const levelCheck = await Subfolder.findOne({owner: user._id, path: NormalizedParentPath})
         if(!levelCheck)
         {
-            return res.status(409).json({ success: true, message: "Folder Must Be Created Under An Existing Folder" })
+            return res.status(409).json({ success: false, message: "Folder Must Be Created Under An Existing Folder" })
         }
 
         if(!FolderParentPath.includes(user.username))
         {
-            return res.status(401).json({ success: true, message: "Folders Must Be Created Under Your Own Ownership Only!" })
+            return res.status(401).json({ success: false, message: "Folders Must Be Created Under Your Own Ownership Only!" })
         }
 
         const subfolder = await Subfolder.create({
