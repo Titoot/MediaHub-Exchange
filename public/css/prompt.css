@@ -180,3 +180,22 @@ background-color: rgba(0,0,0,.1)
     width: 350px;
     padding-left: 32px;
 }
+
+.folder-delete-form .error-image {
+    filter: invert(49%) sepia(77%) saturate(6837%) hue-rotate(333deg) brightness(97%) contrast(93%);
+    padding-top: 27px;
+    padding-left: 16px;
+    width: 20%;
+    display: flex;
+    float: left;
+}
+
+.folder-delete-form .confirm-title-message {
+    font-size: 27px;
+    font-weight: 500;
+    line-height: 42px;
+    text-align: center;
+    padding-left: 20px;
+}
+
+
