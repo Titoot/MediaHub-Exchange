@@ -24,3 +24,7 @@ exports.pathNormalize = (oldPath) => {
     const normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
     return path.normalize(normalizedPath);
 }
+
+exports.escapeRegExp = (string) => {
+    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
