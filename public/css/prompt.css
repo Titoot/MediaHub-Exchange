@@ -9,7 +9,7 @@
     border-radius: 10px;
     /*backdrop-filter: blur(10px);*/
     box-shadow: 0 0 40px rgba(8,7,16,0.6);
-    padding: 40px 35px 90px;
+    padding: 20px 35px 40px;
     padding-left: 15px;
     display: none;
     background-color: #29303a!important;
@@ -73,4 +73,110 @@
 
 .newfolder-form .newfolder-button:hover {
 background-color: rgba(0,0,0,.1)
+}
+
+
+
+/* folder-delete-form */
+
+
+
+.folder-delete-form{
+    /*min-height: 400px;*/
+    height: auto;
+    width: 400px;
+    position: fixed;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 10px;
+    /*backdrop-filter: blur(10px);*/
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    padding: 20px 35px 45px;
+    padding-left: 15px;
+    display: none;
+    background-color: #29303a!important;
+}
+.folder-delete-form *{
+    letter-spacing: 0.5px;
+    outline: none;
+    border: none;
+}
+.folder-delete-form h3{
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 42px;
+    text-align: center;
+    padding-left: 20px;
+}
+
+.folder-delete-form label{
+    margin-top: 30px;
+    font-size: 16px;
+    font-weight: 500;
+}
+.folder-delete-form input{
+    width: 5%;
+    background-color: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    margin-left: 34px;
+}
+
+.folder-delete-form .submit-button{
+    margin-top: 50px;
+    margin-left: 10px;
+    width: 100%;
+    background-color: #ed5e68;
+    color: #ffffff;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.folder-delete-form .submit-button:hover:enabled {
+    filter: brightness(85%);
+}
+
+.submit-button:disabled,
+.submit-button[disabled]{
+  background-color: #666666;
+}
+
+.folder-delete-form .cancel-button{
+    margin-top: 50px;
+    margin-left: 10px;
+    width: 100%;
+    background-color: #8388a4;
+    color: #29303a;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.folder-delete-form .cancel-button:hover {
+    filter: brightness(85%);
+}
+
+.folder-delete-form .folder-to-delete{
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    padding-left: 20px;
+}
+
+
+.folder-delete-form .risk-label{
+    padding-left: 70px;
+    color: #eb3d3d;
+}
+
+.folder-delete-form .risk-message{
+    color: #ef3352;
+    text-align: justify;
+    width: 350px;
+    padding-left: 32px;
 }
