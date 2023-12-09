@@ -36,7 +36,7 @@ exports.CreateFolder = async (req, res) => {
         if (existingFolder) {
             return res.status(409).json({
               success: false,
-              message: "Can't Create a Dublicate Folder In the Same Folder",
+              message: "Can't Create a Duplicate Folder In the Same Folder",
             });
         }
         
@@ -49,7 +49,7 @@ exports.CreateFolder = async (req, res) => {
                 path: ParentPath,
                 owner: user._id
             });
-            await folder.updateOne({subfolders: [subfolder]})
+            await folder.updateOne({ $push: { subfolders: subfolder } })
 
             return res.status(201).json({ success: true, message: "Folder Created Successfully" })
         }
