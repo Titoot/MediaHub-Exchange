@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="/css/info.css">
     <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/user.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
         body {
@@ -212,11 +213,6 @@
     </style>
 </head>
 <body>
-  <% if (isLoggedIn) { %>
-    <p>Welcome, you are logged in!</p>
-  <% } else { %>
-    <p>Please log in to access this page.</p>
-  <% } %>
     <div id="folders-container">
     <div class="tool-bar">MediaHub Exchange
       <div class="toolbar-spacer"></div>
@@ -341,27 +337,48 @@
     </div>
     <div id="auth-container">
       <div class="auth-bar">
+        <% if (isLoggedIn) { %>
+          <button class="settings-button material-icons" onclick="$('.settings-form').slideToggle();">manage_accounts</button>
+        <% } else { %>
         <button class="signup-button material-icons" onclick="$('.signup-form').slideToggle(); $('.login-form').css('display', 'none');">account_circle</button>
         <div class="toolbar-spacer"></div>
         <button class="login-button material-icons" onclick="$('.login-form').slideToggle(); $('.signup-form').css('display', 'none');">login</button>
 
-        <form class="login-form">
-          <button class="close-button material-icons" onclick="$('.login-form').slideToggle();" type="button">close</button>
-          <h3>Login</h3>
-
-          <div class="error-message"></div>
-          <div class="success-message"></div>
-
-          <label for="username">Username</label>
-          <input type="text" placeholder="Username" id="username">
-  
-          <label for="password">Password</label>
-          <input type="password" placeholder="Password" id="password">
-  
-          <button class="submit-button">Log In</button>
-          </div>
+        <% } %>
+      </div>
       </form>
       <div>
+      <% if (isLoggedIn) { %>
+        <form class="settings-form">
+          <button class="close-button material-icons" onclick="$('.settings-form').slideToggle();" type="button">close</button>
+          <h3>Settings</h3>
+  
+          <div class="error-message"></div>
+          <div class="success-message"></div>
+  
+          <label for="password">Password</label>
+          <input type="password" placeholder="New Password" id="password">
+
+          <button class="submit-button">Submit Changes</button>
+          <button class="delete-button">Delete Account</button>
+        </form>
+      <% } else { %>
+      <form class="login-form">
+        <button class="close-button material-icons" onclick="$('.login-form').slideToggle();" type="button">close</button>
+        <h3>Login</h3>
+
+        <div class="error-message"></div>
+        <div class="success-message"></div>
+
+        <label for="username">Username</label>
+        <input type="text" placeholder="Username" id="username">
+
+        <label for="password">Password</label>
+        <input type="password" placeholder="Password" id="password">
+
+        <button class="submit-button">Log In</button>
+      </form>
+
       <form class="signup-form">
         <button class="close-button material-icons" onclick="$('.signup-form').slideToggle();" type="button">close</button>
         <h3>Register</h3>
@@ -376,8 +393,10 @@
         <input type="password" placeholder="Password" id="password">
 
         <button class="submit-button">Sign In</button>
-        </div>
+        
     </form>
+    <% } %>
+  </div>
     <script>
         let loginForm = $(".login-form");
         loginForm.on("submit", (e) => {
