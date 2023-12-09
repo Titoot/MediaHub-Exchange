@@ -97,7 +97,7 @@ exports.Register = async (req, res) => {
       }
 };
 
-exports.isLoggedIn = (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token)
     {
@@ -105,8 +105,17 @@ exports.isLoggedIn = (req, res, next) => {
         next()
         return
     }
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
+    if(!decoded)
+    {
+        res.locals.isLoggedIn = false;
+        next()
+        return
+    }
 
-    if(!jwt.verify(token, process.env.TOKEN_KEY))
+    const user = await User.findById(decoded.userId)
+
+    if(!user)
     {
         res.locals.isLoggedIn = false;
         next()
@@ -117,13 +126,18 @@ exports.isLoggedIn = (req, res, next) => {
     next()
 }
 
-exports.isLoggedInF = (token)  => {
+exports.isLoggedInF = async (token)  => {
     if (!token)
     {
         return false;
     }
-
-    if(!jwt.verify(token, process.env.TOKEN_KEY))
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
+    if(!decoded)
+    {
+        return false;
+    }
+    const user = await User.findById(decoded.userId)
+    if(!user)
     {
         return false;
     }
