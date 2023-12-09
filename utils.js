@@ -22,7 +22,12 @@ exports.formatDate = (date) => {
 
 exports.pathNormalize = (oldPath) => {
     const normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
-    return path.normalize(normalizedPath);
+    const opsys = process.platform
+    if (opsys == "win32" || opsys == "win64")
+    {
+        return path.normalize(normalizedPath);
+    }
+    return normalizedPath.replace(/\//g, "\\") // for unix systems
 }
 
 exports.escapeRegExp = (string) => {
