@@ -19,11 +19,13 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', path.join(__dirname, './public'))
 app.use(cookieParser());
 app.use(UserController.isLoggedIn)
+app.use(FolderController.isOwned)
 
 app.post('/login', UserController.Login)
 app.post('/signup', UserController.Register)
 
 app.post('/createFolder', FolderController.CreateFolder)
+app.delete('/deleteFolder', FolderController.DeleteFolder)
 
 app.get('/', async (req, res) => {
     //await CreateFolder()
@@ -38,7 +40,7 @@ app.get('/', async (req, res) => {
       );
     }
     const token = req.cookies.access_token;
-    res.render('index', {folders: folders, isLoggedIn: res.locals.isLoggedIn });
+    res.render('index', {folders: folders, isLoggedIn: res.locals.isLoggedIn, isOwned: false });
   });
 
 app.get('/:folderName', async (req, res) => {
@@ -51,20 +53,20 @@ app.get('/:folderName', async (req, res) => {
   }
   var folders = await Promise.all(
     folder.subfolders.map(async (folderId) => {
-      return await insertFolder(folderId, true, req.path)
+      return await insertFolder(folderId, true, req.path, res.locals.isOwned)
     })
   );
 
   var files = []
   var files = await Promise.all(
     folder.files.map(async (file) => {
-      return await insertFiles(file);
+      return await insertFiles(file, res.locals.isOwned);
     })
   );
 
   var struct = folders.concat(files)
 
-  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn});
+  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn, isOwned: res.locals.isOwned });
 
 })
 
@@ -79,7 +81,7 @@ app.get('/:folderName/:subFolderName*?', async (req, res) => {
 
   var folders = await Promise.all(
     subfolder.subfolders.map(async (folderId) => {
-      return await insertFolder(folderId, true, req.path)
+      return await insertFolder(folderId, true, req.path, res.locals.isOwned)
     })
   );
 
@@ -87,20 +89,21 @@ app.get('/:folderName/:subFolderName*?', async (req, res) => {
     subfolder.files.map(async (file) => {
       const fileDetails = await Folder.File.findById(file);
       
-      return insertFiles(fileDetails, utils.formatDate(subfolder.modifiedAt));
+      return insertFiles(fileDetails, res.locals.isOwned);
     })
   );
 
   const struct = folders.concat(filesArray)
 
-  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn});
+  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn, isOwned: res.locals.isOwned });
 
 })
 
-async function insertFolder(folderId, isSubFolder=false, routePath=null) {
+async function insertFolder(folderId, isSubFolder=false, routePath=null, isOwned=false) {
   const folder = isSubFolder ? await Folder.Subfolder.findById(folderId) : folderId
   const name = isSubFolder ? path.join(routePath, folder.name) : folder.name
   const icon = isSubFolder ? 'folder' : 'person'
+
   // if MainFolder get user location
   return `
   <li class="list-item">
@@ -113,19 +116,19 @@ async function insertFolder(folderId, isSubFolder=false, routePath=null) {
                 <div class="baritem-3">-</div>
               </a>
               <div class="baritem-3">
-                  -
+              ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
               </div>
             </li>
   `
 }
-async function insertFiles(file) {
+async function insertFiles(file, isOwned=false) {
   const fileType = file.typeModel
   const contentDetails = await getContentDetails(fileType, file.contentDetails)
   //const steamId = getSteamId(Name)
   return await generateFileListItem(file, fileType, contentDetails)
 }
 
-async function generateFileListItem(file, fileType, contentDetails) {
+async function generateFileListItem(file, fileType, contentDetails, isOwned=false) {
   const fileIcon = setcommonAttributes(fileType)
   const commonAttributes = `
     <div class="baritem-1" title="${file.name}">
@@ -162,6 +165,7 @@ async function generateFileListItem(file, fileType, contentDetails) {
             <button class="info-button" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
               <i class="icon material-icons">info_outline</i>
             </button>
+            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
           </div>
         </li>
       `;
@@ -176,6 +180,7 @@ async function generateFileListItem(file, fileType, contentDetails) {
             <button class="info-button" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
               <i class="icon material-icons">info_outline</i>
             </button>
+            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
           </div>
         </li>
       `;
