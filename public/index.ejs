@@ -447,7 +447,7 @@
               const successMessage = $(".login-form .success-message");
               successMessage.text(data.message);
               successMessage.slideToggle();
-              setTimeout(200)
+              setTimeout(400)
               location.reload();
               }
               else
@@ -485,7 +485,7 @@
                 const successMessage = $(".signup-form .success-message");
                 successMessage.text(data.message);
                 successMessage.slideToggle();
-                setTimeout(200)
+                setTimeout(400)
                 location.reload();
               }
               else
@@ -531,7 +531,7 @@
         <div class="folder-to-delete"></div>
 
         <h3 class="risk-message">Deleting this folder will delete all the folder and files inside it, be aware!</h3>
-        <input type="checkbox" id="risk-check" name="risk-check" value="Bike">
+        <input type="checkbox" id="risk-check" name="risk-check">
         <label for="risk-check"> Check to Always skip the timer</label>
         <br>
         <label class="risk-label">(AT YOUR OWN RESPONSIBILITY!!!)</label>
@@ -628,6 +628,45 @@
               errorMessage.text("An error occurred during creating the folder. Error: ", error);
               errorMessage.slideToggle();
               console.error("Error during creating the folder:", error);
+            });
+        });
+
+
+
+        let deleteForm = $(".folder-delete-form");
+        deleteForm.on("submit", (e) => {
+          e.preventDefault();
+          const foldername = $(".folder-delete-form .folder-to-delete").text();
+
+          fetch('/deleteFolder', {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ FolderPath: foldername + '\\' }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+              const successMessage = $(".folder-delete-form .success-message");
+              successMessage.text(data.message);
+              successMessage.slideToggle();
+              setTimeout(200)
+              location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".folder-delete-form .error-message");
+                errorMessage.text(`An error occurred during deleting the folder. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during deleting the folder:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".folder-delete-form .error-message");
+              errorMessage.text("An error occurred during deleting the folder. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during deleting the folder:", error);
             });
         });
     </script>
