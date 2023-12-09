@@ -116,7 +116,7 @@ async function insertFolder(folderId, isSubFolder=false, routePath=null, isOwned
                 <div class="baritem-3">-</div>
               </a>
               <div class="baritem-3">
-              ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
+              ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</button>' : '-'}
               </div>
             </li>
   `
@@ -165,7 +165,7 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
             <button class="info-button" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
               <i class="icon material-icons">info_outline</i>
             </button>
-            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
+            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</button>' : '-'}
           </div>
         </li>
       `;
@@ -180,7 +180,7 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
             <button class="info-button" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
               <i class="icon material-icons">info_outline</i>
             </button>
-            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</span>' : '-'}
+            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</button>' : '-'}
           </div>
         </li>
       `;
