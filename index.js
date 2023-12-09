@@ -5,6 +5,7 @@ const Type = require("./model/type");
 const utils = require("./utils")
 const steam = require("./fileParsing/steam")
 const UserController = require("./controllers/UserController")
+const FolderController = require("./controllers/FolderController")
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const axios = require('axios');
@@ -17,9 +18,12 @@ app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.set('views', path.join(__dirname, './public'))
 app.use(cookieParser());
+app.use(UserController.isLoggedIn)
 
 app.post('/login', UserController.Login)
 app.post('/signup', UserController.Register)
+
+app.post('/createFolder', FolderController.CreateFolder)
 
 app.get('/', async (req, res) => {
     //await CreateFolder()
@@ -29,11 +33,12 @@ app.get('/', async (req, res) => {
     {
       var folders = await Promise.all(
         folder.map(async (folderId) => {
-          return await insertFolder(folderId)
+          return await insertFolder(folderId, false, req.path)
         })
       );
     }
-    res.render('index', {folders: folders});
+    const token = req.cookies.access_token;
+    res.render('index', {folders: folders, isLoggedIn: res.locals.isLoggedIn });
   });
 
 app.get('/:folderName', async (req, res) => {
@@ -46,7 +51,7 @@ app.get('/:folderName', async (req, res) => {
   }
   var folders = await Promise.all(
     folder.subfolders.map(async (folderId) => {
-      return await insertFolder(folderId, true, folderName)
+      return await insertFolder(folderId, true, req.path)
     })
   );
 
@@ -59,20 +64,25 @@ app.get('/:folderName', async (req, res) => {
 
   var struct = folders.concat(files)
 
-  res.render('index', {folders: struct});
+  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn});
 
 })
 
-app.get('/:folderName/:subFolderName', async (req, res) => {
-  var subFolderName = req.params.subFolderName
-  const subfolder = await Folder.Subfolder.findOne({name: subFolderName})
+app.get('/:folderName/:subFolderName*?', async (req, res) => {
+
+  const subfolder = await Folder.Subfolder.findOne({path: utils.pathNormalize(req.path)})
   if(!subfolder)
   {
     res.status(404).send("Folder Not Found");
     return;
   }
 
-  var filesArray = []
+  var folders = await Promise.all(
+    subfolder.subfolders.map(async (folderId) => {
+      return await insertFolder(folderId, true, req.path)
+    })
+  );
+
   var filesArray = await Promise.all(
     subfolder.files.map(async (file) => {
       const fileDetails = await Folder.File.findById(file);
@@ -81,18 +91,20 @@ app.get('/:folderName/:subFolderName', async (req, res) => {
     })
   );
 
-  res.render('index', {folders: filesArray});
+  const struct = folders.concat(filesArray)
+
+  res.render('index', {folders: struct, isLoggedIn: res.locals.isLoggedIn});
 
 })
 
-async function insertFolder(folderId, isSubFolder=false, MainFolder=null) {
+async function insertFolder(folderId, isSubFolder=false, routePath=null) {
   const folder = isSubFolder ? await Folder.Subfolder.findById(folderId) : folderId
-  const name = isSubFolder ? path.join(MainFolder, folder.name) : folder.name
+  const name = isSubFolder ? path.join(routePath, folder.name) : folder.name
   const icon = isSubFolder ? 'folder' : 'person'
   // if MainFolder get user location
   return `
   <li class="list-item">
-              <a gd-type="application/pdf" href="/${name}">
+              <a gd-type="application/pdf" href="${name}">
                 <div class="baritem-1" title="${folder.name}">
                   <i class="icon material-icons">${icon}</i>
                   ${folder.name}

@@ -1,3 +1,5 @@
+const path = require('path');
+
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
   }
@@ -16,4 +18,9 @@ exports.formatDate = (date) => {
         padTo2Digits(date.getSeconds()),
         ].join(':')
     );
+}
+
+exports.pathNormalize = (oldPath) => {
+    const normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
+    return path.normalize(normalizedPath);
 }
