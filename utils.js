@@ -21,7 +21,8 @@ exports.formatDate = (date) => {
 }
 
 exports.pathNormalize = (oldPath) => {
-    const normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
+    let normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
+    normalizedPath = normalizedPath + '\\'
     const opsys = process.platform
     if (opsys == "win32" || opsys == "win64")
     {
