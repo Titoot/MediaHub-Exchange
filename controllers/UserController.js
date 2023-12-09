@@ -97,6 +97,11 @@ exports.Register = async (req, res) => {
       }
 };
 
+exports.logout = (req, res) => {
+  res.clearCookie('access_token');
+  res.status(200).json({ success: true, message: "logged out successfully" })
+};
+
 exports.isLoggedIn = async (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token)

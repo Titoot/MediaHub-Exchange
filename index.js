@@ -23,6 +23,7 @@ app.use(FolderController.isOwned)
 
 app.post('/login', UserController.Login)
 app.post('/signup', UserController.Register)
+app.get('/logout', UserController.logout)
 
 app.post('/createFolder', FolderController.CreateFolder)
 app.delete('/deleteFolder', FolderController.DeleteFolder)

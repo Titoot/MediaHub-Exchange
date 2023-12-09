@@ -368,7 +368,27 @@
         <% if (isLoggedIn) { %>
           <button class="settings-button material-icons" onclick="$('.settings-form').slideToggle();">manage_accounts</button>
           <div class="toolbar-spacer"></div>
-          <button class="settings-button material-icons" onclick="$.cookie('access_token', null, { path: '/' }); location.reload();">logout</button>
+          <button class="logout-button material-icons">logout</button>
+          <script>
+            let logout = $(".logout-button");
+            logout.on('click', function () {
+
+            fetch('/logout', {method: "GET"})
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success){
+                location.reload();
+                }
+                else
+                {
+                  console.error("Error during login:", data.message);
+                }
+              })
+              .catch((error) => {
+                console.error("Error during login:", error);
+              });
+          });
+          </script>
         <% } else { %>
         <button class="signup-button material-icons" onclick="$('.signup-form').slideToggle(); $('.login-form').css('display', 'none');">account_circle</button>
         <div class="toolbar-spacer"></div>
