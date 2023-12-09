@@ -1,0 +1,92 @@
+.nav-bar {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    width: 1000px;
+}
+
+.back-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .87);
+    margin-right: 10px;
+    min-width: 36px;
+    height: 36px;
+    align-items: center;
+}
+
+.back-button:disabled,
+.back-button[disabled]{
+  color: #666666;
+}
+
+.back-button:hover:enabled {
+    background-color: rgba(0,0,0,.1)
+}
+
+.newfolder-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .87);
+    margin-right: 100px;
+    min-width: 36px;
+    height: 36px;
+    align-items: center;
+}
+
+.newfolder-button:hover:enabled {
+    background-color: rgba(0,0,0,.1)
+}
+
+.newfolder-button:disabled,
+.newfolder-button[disabled]{
+  color: #666666;
+}
+
+.newfile-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .87);
+    margin-right: 60px;
+    min-width: 36px;
+    height: 36px;
+    align-items: center;
+}
+
+.newfile-button:hover:enabled {
+    background-color: rgba(0,0,0,.1)
+}
+
+.newfile-button:disabled,
+.newfile-button[disabled]{
+  color: #666666;
+}
+
+.folder-delete-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .87);
+    min-width: 36px;
+    height: 36px;
+    align-items: center;
+}
+
+.folder-delete-button:hover:enabled {
+    background-color: rgba(0,0,0,.1)
+}

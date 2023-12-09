@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/info.css">
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/user.css">
+    <link rel="stylesheet" href="/css/nav-bar.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <style>
@@ -126,7 +127,6 @@
           display: flex;
           min-height: 48px;
           box-sizing: border-box;
-          cursor: pointer; /* remove when adding clickable sorting */
         }
         
         .list-item>a {
@@ -137,6 +137,7 @@
 
         .list-item:not(.nohover):hover {
           background-color: rgba(0,0,0,.08);
+          cursor: pointer;
         }
 
         .baritem-1 {
@@ -237,6 +238,31 @@
       <div class="folder-list">
         <div class="item-row">
           <ul class="list">
+            <li class="list-item nohover">
+              <div class="nav-bar">
+                <button class="back-button material-icons" onclick="window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));">arrow_back</button>
+                <span class="nav-path">/zackaziko/sex</span>
+                <div class="toolbar-spacer"></div>
+                <button class="newfolder-button material-icons">create_new_folder</span>
+                <button class="newfile-button material-icons">note_add</span>
+              </div>
+              <script>
+                $(".nav-path").text(location.pathname)
+                if (window.location.href.slice(0, -1) == window.location.origin)
+                {
+                  $('.back-button').prop('disabled', true);
+                  $('.newfolder-button').prop('disabled', true);
+                  $('.newfile-button').prop('disabled', true);
+                }
+                <% if (isLoggedIn) { %>
+                  <% if (!isOwned) { %>
+                    $('.newfolder-button').prop('disabled', true);
+                    $('.newfile-button').prop('disabled', true);
+                  <% } %>
+                <% } %>
+                
+              </script>
+            </li>
             <li class="list-item nohover">
               <div class="baritem-1">
                 File
