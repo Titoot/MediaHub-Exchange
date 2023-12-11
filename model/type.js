@@ -2,29 +2,29 @@ const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema({
   steamid: { type: String, default: null },
-  genre: String,
-  headerImage: String,
-  description: String,
+  genre: { type: String, default: null },
+  headerImage: { type: String, default: null },
+  description: { type: String, default: null },
 });
 
 const movieSchema = new mongoose.Schema({
   genre: { type: String, default: null },
-  headerImage: String,
-  description: String,
+  headerImage: { type: String, default: null },
+  description: { type: String, default: null },
 });
 
 const seriesSchema = new mongoose.Schema({
-  seasons: Number,
+  seasons: { type: String, default: null },
   genre: { type: String, default: null },
-  headerImage: String,
-  description: String,
+  headerImage: { type: String, default: null },
+  description: { type: String, default: null },
 });
 
 const animeSchema = new mongoose.Schema({
-  seasons: Number,
+  seasons: { type: String, default: null },
   genre: { type: String, default: null },
-  headerImage: String,
-  description: String,
+  headerImage: { type: String, default: null },
+  description: { type: String, default: null },
 });
 
 const Game = mongoose.model('Game', gameSchema);
