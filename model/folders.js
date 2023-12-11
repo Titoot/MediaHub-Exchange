@@ -4,6 +4,7 @@ const fileSchema = new mongoose.Schema({
   name: String,
   content: String,
   path: String,
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true },
   size: { type: String, default: '-' },
   typeModel: {
     type: String,
@@ -17,6 +18,16 @@ const fileSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+fileSchema.pre('save', function (next) {
+  this.modifiedAt = Date.now();
+  next();
+});
+
+fileSchema.pre('updateOne', function (next) {
+  this.modifiedAt = Date.now();
+  next();
 });
 
 const subfolderSchema = new mongoose.Schema({
@@ -38,6 +49,16 @@ const subfolderSchema = new mongoose.Schema({
   },
 });
 
+subfolderSchema.pre('save', function (next) {
+  this.modifiedAt = Date.now();
+  next();
+});
+
+subfolderSchema.pre('updateOne', function (next) {
+  this.modifiedAt = Date.now();
+  next();
+});
+
 const Subfolder = mongoose.model('Subfolder', subfolderSchema);
 
 const folderSchema = new mongoose.Schema({
@@ -56,6 +77,16 @@ const folderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+folderSchema.pre('save', function (next) {
+  this.modifiedAt = Date.now();
+  next();
+});
+
+folderSchema.pre('updateOne', function (next) {
+  this.modifiedAt = Date.now();
+  next();
 });
 
 const File = mongoose.model('File', fileSchema);
