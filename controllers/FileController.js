@@ -71,18 +71,18 @@ exports.CreateFile = async (req, res) => {
             });
             await folder.updateOne({ $push: { files: file } })
 
-            return res.status(201).json({ success: true, message: "Folder Created Successfully" })
+            return res.status(201).json({ success: true, message: "File Created Successfully" })
         }
 
         const levelCheck = await Subfolder.findOne({owner: user._id, path: NormalizedParentPath})
         if(!levelCheck)
         {
-            return res.status(409).json({ success: false, message: "Folder Must Be Created Under An Existing Folder" })
+            return res.status(409).json({ success: false, message: "File Must Be Created Under An Existing Folder" })
         }
 
         if(!FileParentPath.includes(user.username))
         {
-            return res.status(401).json({ success: false, message: "Folders Must Be Created Under Your Own Ownership Only!" })
+            return res.status(401).json({ success: false, message: "Files Must Be Created Under Your Own Ownership Only!" })
         }
 
         const file = await File.create({
@@ -96,7 +96,7 @@ exports.CreateFile = async (req, res) => {
 
         await levelCheck.updateOne({ $push: { files: file } })
 
-        return res.status(201).json({ success: true, message: "Folder Created Successfully" })
+        return res.status(201).json({ success: true, message: "File Created Successfully" })
 
     } catch(brr) {
         console.error(brr)
