@@ -126,15 +126,17 @@ exports.DeleteFile = async (req, res) => {
 
     const user = await User.findById(decoded.userId)
 
-    const subfilesToDelete = await File.findOne({_id: new mongoose.Types.ObjectId(FileId), owner: user._id });
+    const fileToDelete = await File.findOne({_id: new mongoose.Types.ObjectId(FileId), owner: user._id });
+
+    const contentToDelete = await Type.Game.deleteOne({_id: fileToDelete.contentDetails});
     
-    const deletedSubfiles = await Subfolder.updateOne({ $pull: { files: subfilesToDelete._id } });
+    const deletedfile = await Subfolder.updateOne({ files: { $in: fileToDelete._id } },{ $pull: { files: fileToDelete._id } });
 
     const mainFolder = await Folder.findById(user.OwnedFolder)
 
-    const folder = await mainFolder.updateOne({ $pull: { files: subfilesToDelete._id } });
+    const folder = await mainFolder.updateOne({ $pull: { files: fileToDelete._id } });
 
-    await subfilesToDelete.deleteOne({})
+    await fileToDelete.deleteOne()
 
     return res.status(200).json({ success: true, message: "File Deleted Sucessfully" })
 }
