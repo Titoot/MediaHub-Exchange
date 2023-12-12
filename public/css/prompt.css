@@ -199,3 +199,93 @@ background-color: rgba(0,0,0,.1)
 }
 
 
+
+
+/* File Form */
+
+.newfile-form{
+    height: auto;
+    width: 400px;
+    position: fixed;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 10px;
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    padding: 20px 35px 40px;
+    padding-left: 15px;
+    display: none;
+    background-color: #29303a!important;
+}
+.newfile-form *{
+    letter-spacing: 0.5px;
+    outline: none;
+    border: none;
+}
+.newfile-form h3{
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 42px;
+    text-align: center;
+    padding-left: 20px;
+}
+
+.newfile-form label{
+    display: block;
+    margin-top: 30px;
+    font-size: 16px;
+    font-weight: 500;
+}
+.newfile-form input{
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.newfile-form select{
+    display: block;
+    height: 50px;
+    width: 105%;
+    background-color: #383f48;
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.newfile-form .submit-button{
+    margin-top: 50px;
+    margin-left: 10px;
+    width: 100%;
+    background-color: #ffffff;
+    color: #080710;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.newfile-form .newfile-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 32px;
+    transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+    border-radius: 50%;
+    height: 46px;
+    color: rgba(255, 255, 255, .87);
+    align-items: center;
+}
+
+.newfile-form .newfile-button:hover {
+    filter: brightness(85%);
+}

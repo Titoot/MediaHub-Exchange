@@ -245,7 +245,7 @@
                 <span class="nav-path">/zackaziko/sex</span>
                 <div class="toolbar-spacer"></div>
                 <button class="newfolder-button material-icons" onclick="$('.newfolder-form').slideToggle();">create_new_folder</span>
-                <button class="newfile-button material-icons">note_add</span>
+                <button class="newfile-button material-icons" onclick="$('.newfile-form').slideToggle();">note_add</span>
               </div>
               <script>
                 $(".nav-path").text(location.pathname)
@@ -565,6 +565,69 @@
         <button class="cancel-button" onclick="$('.folder-delete-form').slideToggle();" type="button">Cancel</button>
         
       </form>
+
+      <form class="newfile-form">
+        <button class="close-button material-icons" onclick="$('.newfile-form').slideToggle();" type="button">close</button>
+        <h3>Create New File</h3>
+
+        <div class="error-message"></div>
+        <div class="success-message"></div>
+
+        <label for="filename">File Name</label>
+        <input type="text" placeholder="New File Name" id="filename">
+        <label for="size">Size</label>
+        <input type="text" placeholder="File Size" id="size">
+        <label for="type">File Type</label>
+        <select name="type" id="type">
+          <option value="Game">Game</option>
+          <option value="Movie">Movie</option>
+          <option value="Series">Series</option>
+          <option value="Anime">Anime</option>
+        </select>
+
+        <button class="submit-button">Create</button>
+        
+      </form>
+      <script>
+        let newfileForm = $(".newfile-form");
+        newfileForm.on("submit", (e) => {
+          e.preventDefault();
+          const filename = $(".newfile-form input#filename").val();
+          const size = $(".newfile-form input#size").val();
+          const fileType = $('.newfile-form select#type').find(":selected").text();
+
+          fetch('/createFile', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ NewFileName: filename, FileParentPath: location.pathname, FileType: fileType, size: size}),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+              const successMessage = $(".newfile-form .success-message");
+              successMessage.text(data.message);
+              successMessage.slideToggle();
+              setTimeout(200)
+              location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".newfolder-form .error-message");
+                errorMessage.text(`An error occurred during creating the folder. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during creating the folder:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".newfolder-form .error-message");
+              errorMessage.text("An error occurred during creating the folder. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during creating the folder:", error);
+            });
+        });
+      </script>
       <script>
         $(document).ready(function () {
         $('.folder-delete-button').on('click', function () {
