@@ -22,6 +22,11 @@ app.set('views', path.join(__dirname, './public'))
 app.use(cookieParser());
 app.use(UserController.isLoggedIn)
 app.use(FolderController.isOwned)
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  console.error({message: err.message, error: err})
+  res.status(err.statusCode).json({status: err.statusCode, message: 'Internal Server Error'})
+})
 
 app.post('/login', UserController.Login)
 app.post('/signup', UserController.Register)

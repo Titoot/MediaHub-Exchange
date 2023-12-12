@@ -114,22 +114,28 @@ exports.isLoggedIn = async (req, res, next) => {
         next()
         return
     }
-    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
-    if(!decoded)
-    {
-        res.locals.isLoggedIn = false;
-        next()
-        return
-    }
+    try{
+      const decoded = jwt.verify(token, process.env.TOKEN_KEY)
+      if(!decoded)
+      {
+          res.locals.isLoggedIn = false;
+          next()
+          return
+      }
 
-    const user = await User.findById(decoded.userId)
+      const user = await User.findById(decoded.userId)
 
-    if(!user)
-    {
-        res.locals.isLoggedIn = false;
-        next()
-        return
-    }
+      if(!user)
+      {
+          res.locals.isLoggedIn = false;
+          next()
+          return
+      }
+  }catch(brr){
+    res.locals.isLoggedIn = false;
+    next(brr)
+    return
+  }
 
     res.locals.isLoggedIn = true;
     next()
@@ -140,16 +146,22 @@ exports.isLoggedInF = async (token)  => {
     {
         return false;
     }
-    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
-    if(!decoded)
-    {
-        return false;
-    }
-    const user = await User.findById(decoded.userId)
-    if(!user)
-    {
-        return false;
-    }
+    try{
+      const decoded = jwt.verify(token, process.env.TOKEN_KEY)
+      if(!decoded)
+      {
+          return false;
+      }
+      const user = await User.findById(decoded.userId)
+      if(!user)
+      {
+          return false;
+      }
+  }
+  catch(brr){
+    next(brr)
+    return false
+  }
 
     return true;
 }
