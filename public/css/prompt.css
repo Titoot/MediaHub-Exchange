@@ -289,3 +289,9 @@ background-color: rgba(0,0,0,.1)
 .newfile-form .newfile-button:hover {
     filter: brightness(85%);
 }
+
+.newfile-form .optional-text {
+    filter: brightness(85%);
+    font-style: italic;
+    font-weight: 100;
+}
