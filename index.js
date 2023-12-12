@@ -111,6 +111,10 @@ app.get('/:folderName/:subFolderName*?', async (req, res) => {
 
 async function insertFolder(folderId, isSubFolder=false, routePath=null, isOwned=false) {
   const folder = isSubFolder ? await Folder.Subfolder.findById(folderId) : folderId
+  if(!folder)
+  {
+    throw new Error({message: "Folder not found"})
+  }
   const name = isSubFolder ? path.join(routePath, folder.name) : folder.name
   const icon = isSubFolder ? 'folder' : 'person'
 
@@ -133,6 +137,10 @@ async function insertFolder(folderId, isSubFolder=false, routePath=null, isOwned
 }
 async function insertFiles(fileId, isOwned=false) {
   const file = await Folder.File.findById(fileId)
+  if(!file)
+  {
+    throw new Error({message: "File not found"})
+  }
   const fileType = file.typeModel
   const contentDetails = await getContentDetails(fileType, file.contentDetails)
   //const steamId = getSteamId(Name)
