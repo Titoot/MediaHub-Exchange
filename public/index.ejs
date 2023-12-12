@@ -668,17 +668,17 @@
               }
               else
               {
-                const errorMessage = $(".newfolder-form .error-message");
-                errorMessage.text(`An error occurred during creating the folder. Error: ${data.message}`);
+                const errorMessage = $(".newfile-form .error-message");
+                errorMessage.text(`An error occurred during creating the file. Error: ${data.message}`);
                 errorMessage.slideToggle();
-                console.error("Error during creating the folder:", data.message);
+                console.error("Error during creating the file:", data.message);
               }
             })
             .catch((error) => {
-              const errorMessage = $(".newfolder-form .error-message");
-              errorMessage.text("An error occurred during creating the folder. Error: ", error);
+              const errorMessage = $(".newfile-form .error-message");
+              errorMessage.text("An error occurred during creating the file. Error: ", error);
               errorMessage.slideToggle();
-              console.error("Error during creating the folder:", error);
+              console.error("Error during creating the file:", error);
             });
         });
       </script>
