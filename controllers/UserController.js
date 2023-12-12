@@ -45,7 +45,11 @@ exports.Register = async (req, res) => {
     
         // Validate user input
         if (!(username && password)) {
-          return res.status(400).json({success: false, message:"All input is required"});
+          return res.status(400).json({success: false, message:"All Field Inputs Are Required"});
+        }
+
+        if (username.length < 4 || password.length < 4) {
+          return res.status(400).json({success: false, message:"Username and Password Length should be more or equal to 4"});
         }
         // check if user already exist
         // Validate if user exist in our database
@@ -90,7 +94,7 @@ exports.Register = async (req, res) => {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production",
                 })
-                .status(200)
+                .status(201)
                 .json({ success: true, message: "Account created successfully 😊 👌" })
       } catch (err) {
         console.log(err);
