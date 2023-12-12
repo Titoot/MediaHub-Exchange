@@ -114,7 +114,7 @@ exports.DeleteFolder = async (req, res) => {
 
     const mainFolder = await Folder.findById(user.OwnedFolder)
 
-    await mainFolder.updateOne({ $pullAll: { subfolders: subfolderIds, subfiles: subfileIds } });
+    await mainFolder.updateOne({ $pullAll: { subfolders: subfolderIds } });
 
     return res.status(200).json({ success: true, message: "Folder recursively Deleted Sucessfully" })
 }
