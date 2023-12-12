@@ -34,7 +34,7 @@ exports.Login = async (req, res) => {
       return res.status(400).json({success: false, message: "Invalid Credentials"});
   }catch(err)
   {
-    console.log(err);
+    next(brr)
   }
 }
 
@@ -97,7 +97,7 @@ exports.Register = async (req, res) => {
                 .status(201)
                 .json({ success: true, message: "Account created successfully 😊 👌" })
       } catch (err) {
-        console.log(err);
+        next(brr)
       }
 };
 

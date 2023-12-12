@@ -77,11 +77,7 @@ exports.CreateFolder = async (req, res) => {
         return res.status(201).json({ success: true, message: "Folder Created Successfully" })
 
     } catch(brr) {
-        console.error(brr)
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-          });
+        next(brr)
     }
 }
 
