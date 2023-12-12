@@ -36,6 +36,7 @@ app.post('/createFolder', FolderController.CreateFolder)
 app.delete('/deleteFolder', FolderController.DeleteFolder)
 
 app.post('/createFile', FileController.CreateFile)
+app.delete('/deleteFile', FileController.DeleteFile)
 
 app.get('/', async (req, res) => {
 
@@ -140,14 +141,6 @@ async function insertFiles(fileId, isOwned=false) {
 
 async function generateFileListItem(file, fileType, contentDetails, isOwned=false) {
   const fileIcon = setcommonAttributes(fileType)
-  const commonAttributes = `
-    <div class="baritem-1" title="${file.name}">
-      <i class="icon material-icons">${fileIcon}</i>
-      ${file.name}
-    </div>
-    <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
-    <div class="baritem-3">${file.size}</div>
-  `;
 
   switch (fileType) {
     case 'Game':
@@ -161,14 +154,24 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
           url: steamUrl
           });
         const steamData = res.data[steamId].data
-        await file.updateOne({ name: steamData.name })
+        await file.set({ name: steamData.name }).save()
         await contentDetails.set({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description}).save()
       }
+
+      const commonAttributes = `
+      <div class="baritem-1" title="${file.name}">
+        <i class="icon material-icons">${fileIcon}</i>
+        ${file.name}
+      </div>
+      <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
+      <div class="baritem-3">${file.size}</div>
+    `;
 
       const gameData = contentDetails;
       return `
         <li class="list-item">
           <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
+          <span hidden>${file.id}</span>
             ${commonAttributes}
           </a>
           <div class="baritem-3">
@@ -184,6 +187,7 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
       return `
         <li class="list-item">
           <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
+          <span hidden>${file.id}</span>
             ${commonAttributes}
           </a>
           <div class="baritem-3">

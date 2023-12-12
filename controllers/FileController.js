@@ -1,5 +1,6 @@
 const UserController = require("../controllers/UserController");
 const { File, Folder, Subfolder } = require("../model/folders");
+const mongoose = require('mongoose');
 const { User } = require("../model/user");
 const Type = require("../model/type");
 const jwt = require("jsonwebtoken");
@@ -65,7 +66,7 @@ exports.CreateFile = async (req, res) => {
                 name: NewFileName,
                 path: ParentPath,
                 owner: user._id,
-                size: size ? size : '-',
+                size: size || '-',
                 typeModel: FileType,
                 contentDetails: contentDetails
             });
@@ -101,4 +102,35 @@ exports.CreateFile = async (req, res) => {
     } catch(brr) {
         next(brr)
     }
+}
+
+exports.DeleteFile = async (req, res) => {
+    const { FileId } = req.body;
+
+    if (!(FileId)) {
+        return res.status(400).json({success: false, message: "All Field Inputs Are Required"});
+    }
+
+    const token = req.cookies.access_token;
+    const isLoggedIn = await UserController.isLoggedInF(token)
+    if(!isLoggedIn)
+    {
+        return res.status(401).json({ success: false, message: "User Unauthenticated" })
+    }
+
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+
+    const user = await User.findById(decoded.userId)
+
+    const subfilesToDelete = await File.findOne({_id: new mongoose.Types.ObjectId(FileId), owner: user._id });
+    
+    const deletedSubfiles = await Subfolder.updateOne({ $pull: { files: subfilesToDelete._id } });
+
+    const mainFolder = await Folder.findById(user.OwnedFolder)
+
+    const folder = await mainFolder.updateOne({ $pull: { files: subfilesToDelete._id } });
+
+    await subfilesToDelete.deleteOne({})
+
+    return res.status(200).json({ success: true, message: "File Deleted Sucessfully" })
 }

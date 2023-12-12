@@ -588,6 +588,60 @@
         <button class="submit-button">Create</button>
         
       </form>
+
+      <form class="file-delete-form">
+        <button class="close-button material-icons" onclick="$('.file-delete-form').slideToggle();" type="button">close</button>
+        <h3>Are you sure you want to delete this file?</h3>
+
+        <div class="error-message"></div>
+        <div class="success-message"></div>
+
+        <div class="file-to-delete"></div>
+        <div class="file-id" hidden></div>
+        <div class="button-container">
+          <button class="submit-button">Delete</button>
+          <button class="cancel-button" onclick="$('.file-delete-form').slideToggle();" type="button">Cancel</button>
+        </div>
+        
+      </form>
+      <script>
+        let filedeleteForm = $(".file-delete-form");
+        filedeleteForm.on("submit", (e) => {
+          e.preventDefault();
+          const fileId = $(".file-delete-form .file-id").text();
+
+          fetch('/deleteFile', {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ FileId: fileId }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+              const successMessage = $(".file-delete-form .success-message");
+              successMessage.text(data.message);
+              successMessage.slideToggle();
+              setTimeout(200)
+              location.reload();
+              }
+              else
+              {
+                const errorMessage = $(".file-delete-form .error-message");
+                errorMessage.text(`An error occurred during deleting the file. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during deleting the file:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".file-delete-form .error-message");
+              errorMessage.text("An error occurred during deleting the file. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during deleting the file:", error);
+            });
+        });
+      </script>
       <script>
         let newfileForm = $(".newfile-form");
         newfileForm.on("submit", (e) => {
@@ -629,6 +683,20 @@
         });
       </script>
       <script>
+        $(document).ready(function () {
+        $('.file-delete-button').on('click', function () {
+          var closestLi = $(this).closest('li');
+
+          var titleValue = closestLi.find('div').attr('title');
+          var IdValue = closestLi.find('span').text();
+            
+          $(".file-to-delete").text(location.pathname +'/'+ titleValue)
+          $(".file-id").text(IdValue)
+
+          $('.file-delete-form').slideToggle();
+        });
+      });
+
         $(document).ready(function () {
         $('.folder-delete-button').on('click', function () {
           var closestLi = $(this).closest('li');
