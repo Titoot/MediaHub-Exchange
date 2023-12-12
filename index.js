@@ -141,6 +141,14 @@ async function insertFiles(fileId, isOwned=false) {
 
 async function generateFileListItem(file, fileType, contentDetails, isOwned=false) {
   const fileIcon = setcommonAttributes(fileType)
+  const commonAttributes = `
+    <div class="baritem-1" title="${file.name}">
+      <i class="icon material-icons">${fileIcon}</i>
+      ${file.name}
+    </div>
+    <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
+    <div class="baritem-3">${file.size}</div>
+  `;
 
   switch (fileType) {
     case 'Game':
@@ -157,15 +165,6 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
         await file.set({ name: steamData.name }).save()
         await contentDetails.set({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description}).save()
       }
-
-      const commonAttributes = `
-      <div class="baritem-1" title="${file.name}">
-        <i class="icon material-icons">${fileIcon}</i>
-        ${file.name}
-      </div>
-      <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
-      <div class="baritem-3">${file.size}</div>
-    `;
 
       const gameData = contentDetails;
       return `
