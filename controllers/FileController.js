@@ -100,7 +100,11 @@ exports.CreateFile = async (req, res) => {
         return res.status(201).json({ success: true, message: "File Created Successfully" })
 
     } catch(brr) {
-        next(brr)
+        console.error(brr)
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+          });
     }
 }
 
