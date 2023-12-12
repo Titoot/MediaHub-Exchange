@@ -350,7 +350,11 @@
     </script>
     <script>
       function showInfo(name, description, image, steamid, size, userLocation) {
-        $('#info-container').slideToggle();;
+        if(!($('#info-container').is(":visible")))
+        {
+          $('#info-container').slideToggle();
+        }
+        
         $('.info-title').text(name);
         $('.text-content p').text(description);
         $('.card-image').attr('src', image);
@@ -360,6 +364,7 @@
         $("#steam-url").attr('href',`https://store.steampowered.com/app/${steamid}/`);
         $("#size").text(size);
         $("#user-location").text(userLocation);
+        
       }
     </script>
     </div>

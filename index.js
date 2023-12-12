@@ -1,16 +1,18 @@
 require("dotenv").config();
-require("./config/database").connect();
+if (process.env.NODE_ENV !== 'test') {
+  require("./config/database").connect();
+}
 const Folder = require("./model/folders");
 const Type = require("./model/type");
 const utils = require("./utils")
 const steam = require("./fileParsing/steam")
 const UserController = require("./controllers/UserController")
 const FolderController = require("./controllers/FolderController")
+const FileController = require("./controllers/FileController")
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const axios = require('axios');
 const path = require('path');
-const fs = require('fs');
 
 const app = express();
 
@@ -28,9 +30,10 @@ app.get('/logout', UserController.logout)
 app.post('/createFolder', FolderController.CreateFolder)
 app.delete('/deleteFolder', FolderController.DeleteFolder)
 
+app.post('/createFile', FileController.CreateFile)
+
 app.get('/', async (req, res) => {
-    //await CreateFolder()
-    var folders = []
+
     const folder = await Folder.Folder.find({})
     if(folder)
     {
@@ -40,7 +43,7 @@ app.get('/', async (req, res) => {
         })
       );
     }
-    const token = req.cookies.access_token;
+
     res.render('index', {folders: folders, isLoggedIn: res.locals.isLoggedIn, isOwned: false });
   });
 
@@ -60,8 +63,8 @@ app.get('/:folderName', async (req, res) => {
 
   var files = []
   var files = await Promise.all(
-    folder.files.map(async (file) => {
-      return await insertFiles(file, res.locals.isOwned);
+    folder.files.map(async (fileId) => {
+      return await insertFiles(fileId, res.locals.isOwned);
     })
   );
 
@@ -122,11 +125,12 @@ async function insertFolder(folderId, isSubFolder=false, routePath=null, isOwned
             </li>
   `
 }
-async function insertFiles(file, isOwned=false) {
+async function insertFiles(fileId, isOwned=false) {
+  const file = await Folder.File.findById(fileId)
   const fileType = file.typeModel
   const contentDetails = await getContentDetails(fileType, file.contentDetails)
   //const steamId = getSteamId(Name)
-  return await generateFileListItem(file, fileType, contentDetails)
+  return await generateFileListItem(file, fileType, contentDetails, isOwned)
 }
 
 async function generateFileListItem(file, fileType, contentDetails, isOwned=false) {
@@ -136,7 +140,7 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
       <i class="icon material-icons">${fileIcon}</i>
       ${file.name}
     </div>
-    <div class="baritem-2">${file.modifiedDate}</div>
+    <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
     <div class="baritem-3">${file.size}</div>
   `;
 
@@ -152,8 +156,8 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
           url: steamUrl
           });
         const steamData = res.data[steamId].data
-        await file.updateOne({ name: steamData.name, modifiedAt: Date.now})
-        await contentDetails.updateOne({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description})
+        await file.updateOne({ name: steamData.name })
+        await contentDetails.set({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description}).save()
       }
 
       const gameData = contentDetails;
@@ -163,10 +167,10 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
             ${commonAttributes}
           </a>
           <div class="baritem-3">
+          ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
             <button class="info-button" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
               <i class="icon material-icons">info_outline</i>
             </button>
-            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</button>' : '-'}
           </div>
         </li>
       `;
@@ -178,10 +182,10 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
             ${commonAttributes}
           </a>
           <div class="baritem-3">
+            ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
             <button class="info-button" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
               <i class="icon material-icons">info_outline</i>
             </button>
-            ${isOwned ? '<button class="folder-delete-button material-icons">folder_delete</button>' : '-'}
           </div>
         </li>
       `;
