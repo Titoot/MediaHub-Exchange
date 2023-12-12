@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const fileSchema = new mongoose.Schema({
   name: String,
   content: String,
-  path: String,
+  path: { type: String, unique: true },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true },
   size: { type: String, default: '-' },
   typeModel: {
@@ -33,7 +33,7 @@ fileSchema.pre('updateOne', function (next) {
 const subfolderSchema = new mongoose.Schema({
   name: String,
   owner: { type: mongoose.Schema.Types.ObjectId, required: true },
-  path: String,
+  path: { type: String, unique: true },
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File', // Reference to the File model
