@@ -34,3 +34,16 @@ exports.pathNormalize = (oldPath) => {
 exports.escapeRegExp = (string) => {
     return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
+
+exports.escapeHTML = (s) => {
+    if(!s)
+    {
+        return s
+    }
+    let lookup = {
+        '\'': "\\'",
+        '<': "&lt;",
+        '>': "&gt;"
+    };
+    return s.replace( /['<>]/g, c => lookup[c] );
+}

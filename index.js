@@ -143,7 +143,6 @@ async function insertFiles(fileId, isOwned=false) {
   }
   const fileType = file.typeModel
   const contentDetails = await getContentDetails(fileType, file.contentDetails)
-  //const steamId = getSteamId(Name)
   return await generateFileListItem(file, fileType, contentDetails, isOwned)
 }
 
@@ -163,6 +162,8 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
       if(contentDetails.steamid == null)
       {
         const steamId = await steam.getSteamId(file.name)
+        if(steamId !== -1)
+        {
         steamUrl = `https://store.steampowered.com/api/appdetails?appids=${steamId}`
 
         const res = await axios({
@@ -173,17 +174,21 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned=fals
         await file.set({ name: steamData.name }).save()
         await contentDetails.set({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description}).save()
       }
+      else{
+        await contentDetails.set({ steamid: -1}).save()
+      }
+      }
 
       const gameData = contentDetails;
       return `
         <li class="list-item">
-          <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
+          <a gd-type="application/pdf" onclick="showInfo('${utils.escapeHTML(file.name)}', '${utils.escapeHTML(gameData.description)}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
           <span hidden>${file.id}</span>
             ${commonAttributes}
           </a>
           <div class="baritem-3">
           ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
-            <button class="info-button" onclick="showInfo('${file.name}', '${gameData.description}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
+            <button class="info-button" onclick="showInfo('${utils.escapeHTML(file.name)}', '${utils.escapeHTML(gameData.description)}', '${gameData.headerImage}', '${gameData.steamid}', '${file.size}', 'fuck it forgot to create the schema')">
               <i class="icon material-icons">info_outline</i>
             </button>
           </div>
