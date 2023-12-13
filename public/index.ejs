@@ -255,11 +255,9 @@
                   $('.newfolder-button').prop('disabled', true);
                   $('.newfile-button').prop('disabled', true);
                 }
-                <% if (isLoggedIn) { %>
-                  <% if (!isOwned) { %>
+                <% if (!isLoggedIn || !isOwned) { %>
                     $('.newfolder-button').prop('disabled', true);
                     $('.newfile-button').prop('disabled', true);
-                  <% } %>
                 <% } %>
                 
               </script>
