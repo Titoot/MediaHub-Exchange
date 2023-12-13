@@ -79,7 +79,7 @@ exports.CreateFolder = async (req, res) => {
   }
 };
 
-exports.DeleteFolder = async (req, res) => {
+exports.DeleteFolder = async (req, res, next) => {
   const { FolderPath } = req.body;
 
   if (!(FolderPath)) {

@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { Folder } = require('../model/folders');
 const { User } = require('../model/user');
 
-exports.Login = async (req, res) => {
+exports.Login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -34,12 +34,11 @@ exports.Login = async (req, res) => {
     }
     return res.status(400).json({ success: false, message: 'Invalid Credentials' });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
 
-exports.Register = async (req, res) => {
+exports.Register = async (req, res, next) => {
   try {
     // Get user input
     const { username, password } = req.body;
@@ -97,7 +96,6 @@ exports.Register = async (req, res) => {
       .status(201)
       .json({ success: true, message: 'Account created successfully 😊 👌' });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };

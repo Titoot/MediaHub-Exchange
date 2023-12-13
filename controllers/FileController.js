@@ -7,7 +7,7 @@ const { User } = require('../model/user');
 const Type = require('../model/type');
 const utils = require('../utils');
 
-exports.CreateFile = async (req, res) => {
+exports.CreateFile = async (req, res, next) => {
   const {
     FileParentPath, NewFileName, FileType, size,
   } = req.body;
@@ -100,7 +100,7 @@ exports.CreateFile = async (req, res) => {
   }
 };
 
-exports.DeleteFile = async (req, res) => {
+exports.DeleteFile = async (req, res, next) => {
   const { FileId } = req.body;
 
   if (!(FileId)) {
