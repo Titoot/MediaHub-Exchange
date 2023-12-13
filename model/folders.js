@@ -41,7 +41,7 @@ const subfolderSchema = new mongoose.Schema({
   subfolders: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subfolder',
-    default: null
+    default: null,
   }],
   modifiedAt: {
     type: Date,
@@ -62,16 +62,16 @@ subfolderSchema.pre('updateOne', function (next) {
 const Subfolder = mongoose.model('Subfolder', subfolderSchema);
 
 const folderSchema = new mongoose.Schema({
-  name: {type: String, unique: true},
+  name: { type: String, unique: true },
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File',
-    default: null
+    default: null,
   }],
   subfolders: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subfolder',
-    default: null
+    default: null,
   }],
   modifiedAt: {
     type: Date,
