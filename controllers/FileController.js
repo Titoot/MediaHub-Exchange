@@ -56,7 +56,7 @@ exports.CreateFile = async (req, res, next) => {
         break;
 
       default:
-        throw new Error('Invalid FileType');
+        next(new Error('Invalid FileType'));
     }
 
     if (isMainFile) {
