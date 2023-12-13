@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const fileSchema = new mongoose.Schema({
-  name: String,
+  name: { type: String, maxLength: 50 },
   content: String,
   path: { type: String, unique: true },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -31,7 +31,7 @@ fileSchema.pre('updateOne', function (next) {
 });
 
 const subfolderSchema = new mongoose.Schema({
-  name: String,
+  name: { type: String, maxLength: 50 },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true },
   path: { type: String, unique: true },
   files: [{
@@ -62,7 +62,7 @@ subfolderSchema.pre('updateOne', function (next) {
 const Subfolder = mongoose.model('Subfolder', subfolderSchema);
 
 const folderSchema = new mongoose.Schema({
-  name: { type: String, unique: true },
+  name: { type: String, maxLength: 50, unique: true },
   files: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'File',
