@@ -246,6 +246,7 @@ background-color: rgba(0,0,0,.1)
     margin-top: 8px;
     font-size: 14px;
     font-weight: 300;
+    flex-shrink: 0;
 }
 
 .newfile-form select{
@@ -291,9 +292,41 @@ background-color: rgba(0,0,0,.1)
 }
 
 .newfile-form .optional-text {
-    filter: brightness(85%);
+    color: #d5d7db;
     font-style: italic;
     font-weight: 100;
+}
+
+.newfile-form .search-type-button {
+  background-color: #383f48;
+  color: #e6e6e6;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 50%;
+  transition: all .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,1,1),-webkit-box-shadow .2s cubic-bezier(.4,0,1,1);
+  height: 36px;
+  min-width: 36px;
+  cursor: pointer;
+  position: absolute;
+  margin-top: 8px;
+  right: 0;
+  margin-right: -5px;
+}
+
+.newfile-form .search-type-button:hover {
+    filter: brightness(85%);
+}
+
+.label-warpper {
+  display: grid;
+  align-items: flex-start;
+  grid-template-rows: 50px 70px;
+  position: relative;
+}
+
+.search-warpper {
+  display: flex;
+  align-items: center;
 }
 
 

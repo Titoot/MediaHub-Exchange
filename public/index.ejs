@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/user.css">
     <link rel="stylesheet" href="/css/nav-bar.css">
     <link rel="stylesheet" href="/css/prompt.css">
+    <link rel="stylesheet" href="/css/search.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <style>
@@ -563,18 +564,35 @@
         <button class="cancel-button" onclick="$('.folder-delete-form').slideToggle();" type="button">Cancel</button>
         
       </form>
-
       <form class="newfile-form">
         <button class="close-button material-icons" onclick="$('.newfile-form').slideToggle();" type="button">close</button>
         <h3>Create New File</h3>
 
         <div class="error-message"></div>
         <div class="success-message"></div>
-
-        <label for="filename">File Name</label>
-        <input type="text" placeholder="New File Name" id="filename">
-        <label for="size">Size <span class="optional-text">optional<span></label>
-        <input type="text" placeholder="File Size" id="size">
+        <div class="label-warpper">
+          <label for="filename">File Name</label>
+          <div class="search-warpper">
+            <input type="text" placeholder="New File Name" id="filename">
+            <button class="search-type-button" type="button" onclick="$('.search-menu').slideToggle()">
+              <i class="search-icon material-icons">search</i>
+            </button>
+          </div>
+          <div class="search-menu">
+            <div class="item-row">
+              <ul class="list">
+                <li class="list-item">
+                  <div class="image-container">
+                  </div>
+                  <div class="media-details">
+                  <span class="media-title">None</span>
+                  <span class="media-description"></span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
         <label for="type">File Type</label>
         <select name="type" id="type">
           <option value="Game">Game</option>
@@ -582,6 +600,8 @@
           <option value="Series">Series</option>
           <option value="Anime">Anime</option>
         </select>
+        <label for="size">Size <span class="optional-text">optional<span></label>
+        <input type="text" placeholder="File Size" id="size">
 
         <button class="submit-button">Create</button>
         
