@@ -574,7 +574,7 @@
           <label for="filename">File Name</label>
           <div class="search-warpper">
             <input type="text" placeholder="New File Name" id="filename" required>
-            <button class="search-type-button" type="button" onclick="$('.search-menu').slideToggle()">
+            <button class="search-type-button" type="button">
               <i class="search-icon material-icons">search</i>
             </button>
           </div>
@@ -625,7 +625,64 @@
         
       </form>
       <script>
-          $(".newfile-form .list").on("click", ".list-item", function(event){
+          $('.search-type-button').on('click', function () {
+            const fileTitle =  $(".newfile-form input#filename").val();
+            const fileType = $('.newfile-form select#type').find(":selected").text();
+            if($('.search-menu').is(':visible'))
+            {
+              $('.search-menu').slideToggle();
+              $('.search-menu .list li:not(:first-child)').remove();
+            }else{
+              $('.search-menu .list li:not(:first-child)').remove();
+            }
+            
+            fetch('/mediaSearch', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ searchQuery: fileTitle, fileType: fileType }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success){
+
+              
+              $.each(data.results, function(_, result) {
+                var standardItem = $('<li class="list-item">' +
+                '<div class="image-container"></div>' +
+                '<div class="media-details">' +
+                '<span class="media-title"></span>' +
+                '<span class="media-description"></span>' +
+                '<span class="media-id" hidden></span>' +
+                '</div>' +
+                '</li>');
+                
+                standardItem.find('.media-title').text(result.name);
+                standardItem.find('.media-description').text(result.release);
+                standardItem.find('.media-id').text(result.mediaId);
+                standardItem.find('.image-container').css('background-image', 'url("' + result.image + '")');
+                $('.search-menu .list').append(standardItem);
+              });
+
+              $('.search-menu').slideToggle();
+              }
+              else
+              {
+                const errorMessage = $(".newfile-form .error-message");
+                errorMessage.text(`An error occurred during fetching media data. Error: ${data.message}`);
+                errorMessage.slideToggle();
+                console.error("Error during fetching media data:", data.message);
+              }
+            })
+            .catch((error) => {
+              const errorMessage = $(".newfile-form .error-message");
+              errorMessage.text("An error occurred during fetching media data. Error: ", error);
+              errorMessage.slideToggle();
+              console.error("Error during fetching media data:", error);
+            });
+          })
+          $(".newfile-form .list").on("click", ".list-item", function(){
             const mediaTitle = $(this).find(".media-title").text();
             const mediaDescription = $(this).find(".media-description").text();
 
@@ -634,11 +691,22 @@
               $('.search-menu').slideToggle();
               return;
             }
-            const mediaId = $(".newfile-form .media-id").text();
+            const mediaId = $(this).find(".media-id").text();
             $(".newfile-form .selected-media-id").text(mediaId);
             $(".newfile-form input#filename").val(mediaTitle);
             $('.search-menu').slideToggle();
 
+          });
+
+          $(document).mouseup(function(e) 
+          {
+              var container = $(".search-menu");
+
+              // if the target of the click isn't the container nor a descendant of the container
+              if (!container.is(e.target) && container.has(e.target).length === 0) 
+              {
+                  container.slideUp();
+              }
           });
       </script>
       <script>
