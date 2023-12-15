@@ -573,7 +573,7 @@
         <div class="label-warpper">
           <label for="filename">File Name</label>
           <div class="search-warpper">
-            <input type="text" placeholder="New File Name" id="filename">
+            <input type="text" placeholder="New File Name" id="filename" required>
             <button class="search-type-button" type="button" onclick="$('.search-menu').slideToggle()">
               <i class="search-icon material-icons">search</i>
             </button>
@@ -587,12 +587,14 @@
                   <div class="media-details">
                   <span class="media-title">None</span>
                   <span class="media-description"></span>
+                  <span class="media-id" hidden></span>
                   </div>
                 </li>
               </ul>
             </div>
           </div>
         </div>
+        <span class="selected-media-id" hidden></span>
         <label for="type">File Type</label>
         <select name="type" id="type">
           <option value="Game">Game</option>
@@ -622,6 +624,23 @@
         </div>
         
       </form>
+      <script>
+          $(".newfile-form .list").on("click", ".list-item", function(event){
+            const mediaTitle = $(this).find(".media-title").text();
+            const mediaDescription = $(this).find(".media-description").text();
+
+            if(mediaTitle === "None"){
+              $(".newfile-form input#filename").attr('placeholder', 'please add the file name');
+              $('.search-menu').slideToggle();
+              return;
+            }
+            const mediaId = $(".newfile-form .media-id").text();
+            $(".newfile-form .selected-media-id").text(mediaId);
+            $(".newfile-form input#filename").val(mediaTitle);
+            $('.search-menu').slideToggle();
+
+          });
+      </script>
       <script>
         let filedeleteForm = $(".file-delete-form");
         filedeleteForm.on("submit", (e) => {
@@ -666,14 +685,17 @@
           e.preventDefault();
           const filename = $(".newfile-form input#filename").val();
           const size = $(".newfile-form input#size").val();
-          const fileType = $('.newfile-form select#type').find(":selected").text();
+          const mediaId =  $(".newfile-form .selected-media-id").text();
+          const IsNone = mediaId === "";
+          const fileType = IsNone ? "None" : $('.newfile-form select#type').find(":selected").text();
+          
 
           fetch('/createFile', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ NewFileName: filename, FileParentPath: location.pathname, FileType: fileType, size: size}),
+            body: JSON.stringify({ NewFileName: filename, FileParentPath: location.pathname, FileType: fileType, size: size, mediaId: mediaId}),
           })
             .then((response) => response.json())
             .then((data) => {
