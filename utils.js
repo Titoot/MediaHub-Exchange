@@ -36,8 +36,9 @@ exports.escapeHTML = (s) => {
   }
   const lookup = {
     '\'': "\\'",
+    '"': '&quot;',
     '<': '&lt;',
     '>': '&gt;',
   };
-  return s.replace(/['<>]/g, (c) => lookup[c]);
+  return s.replace(/['"<>]/g, (c) => lookup[c]);
 };
