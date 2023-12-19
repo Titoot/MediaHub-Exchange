@@ -243,7 +243,7 @@
             <li class="list-item nohover">
               <div class="nav-bar">
                 <button class="back-button material-icons" onclick="window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));">arrow_back</button>
-                <span class="nav-path">/zackaziko/sex</span>
+                <span class="nav-path"></span>
                 <div class="toolbar-spacer"></div>
                 <button class="newfolder-button material-icons" onclick="$('.newfolder-form').slideToggle();">create_new_folder</span>
                 <button class="newfile-button material-icons" onclick="$('.newfile-form').slideToggle();">note_add</span>
@@ -300,13 +300,21 @@
         <img class="card-image" src="" alt="Card Image">
         <div class="text-content">
           <p></p>
-          <b>Steam ID: </b><span id="steam-id"></span>
+          <b>Media ID: </b><span id="media-id"></span>
           <br>
-          <b>Steam URL: </b><a id="steam-url" href="" target="_blank"></a></span>
+          <b>Genres: </b><span id="genres"></span>
+          <br>
+          <div class="series-info" hidden>
+            <b>Num of Seasons: </b><span id="seasons"></span>
+            <br>
+            <b>Num of Episodes: </b><span id="episodes"></span>
+            <br>
+            <b>Status: </b><span id="status"></span>
+            <br>
+          </div>
+          <b>Release Year: </b><span id="release"></span>
           <br>
           <b>Size: </b><span id="size"></span>
-          <br>
-          <b>User PickUp Location: </b><span id="user-location"></span>
         </div>
       </div>
 
@@ -348,21 +356,28 @@
         });
     </script>
     <script>
-      function showInfo(name, description, image, steamid, size, userLocation) {
+      function showInfo(name, description, image, mediaId, size, genre, release, seasons, episodes, status) {
         if(!($('#info-container').is(":visible")))
         {
           $('#info-container').slideToggle();
         }
-        
+        $('.series-info').hide();
         $('.info-title').text(name);
         $('.text-content p').text(description);
         $('.card-image').attr('src', image);
 
-        $("#steam-id").text(steamid);
-        $("#steam-url").text(`https://store.steampowered.com/app/${steamid}/`);
-        $("#steam-url").attr('href',`https://store.steampowered.com/app/${steamid}/`);
+        $("#media-id").text(mediaId);
+        $("#genres").text(genre);
+        $("#release").text(release);
         $("#size").text(size);
-        $("#user-location").text(userLocation);
+
+        if(seasons !== "undefined" || episodes !== "undefined" || status !== "undefined")
+        {
+          $('.series-info').show();
+          $("#seasons").text(seasons);
+          $("#episodes").text(episodes);
+          $("#status").text(status);
+        }
         
       }
     </script>
