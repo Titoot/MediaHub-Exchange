@@ -26,13 +26,11 @@ exports.search = async (req, res, next) => {
         result = await getRawgList(searchQuery);
         break;
       case 'Movie':
-        result = await getSimklList(searchQuery, types.Movie);
+        result = await getTMDBList(searchQuery, types.Movie);
         break;
       case 'Series':
-        result = await getSimklList(searchQuery, types.Series);
-        break;
       case 'Anime':
-        result = await getSimklList(searchQuery, types.Anime);
+        result = await getTMDBList(searchQuery, types.Series);
         break;
 
       default:
@@ -60,29 +58,30 @@ async function getRawgList(searchQuery) {
     mediaId: result.id,
     slug: result.slug,
     name: result.name,
-    image: result.background_image,
+    image: result.background_image.replace('/media/', '/media/resize/420/-/'),
     release: new Date(result.released).getFullYear(),
   }));
 
   return reformattedJson;
 }
 
-async function getSimklList(searchQuery, type) {
-  const url = `https://api.simkl.com/search/${type}?q=${searchQuery}&page=1&limit=10&client_id=${process.env.SIMKL_API_KEY}`;
+async function getTMDBList(searchQuery, type) {
+  const url = `https://api.themoviedb.org/3/search/${type}?query=${searchQuery}&api_key=${process.env.TMDB_API_KEY}`;
   const response = await axios.get(url);
-  const jsonData = JSON.parse(JSON.stringify(response.data));
+  const jsonData = JSON.parse(JSON.stringify(response.data)).results;
 
   if (!jsonData) {
     return -1;
   }
 
   const reformattedJson = jsonData.map((result) => ({
-    mediaId: result.ids.simkl_id,
-    slug: result.ids.slug,
-    name: result.title,
-    image: `https://wsrv.nl/?url=https://simkl.in/posters/${result.poster}_w.jpg`,
-    release: result.year,
+    mediaId: result.id,
+    name: result.name,
+    image: `https://image.tmdb.org/t/p/w94_and_h141_bestv2/${result.poster_path}`,
+    release: new Date(result.first_air_date).getFullYear(),
   }));
 
   return reformattedJson;
 }
+
+exports.types = types;

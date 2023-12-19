@@ -9,7 +9,7 @@ const utils = require('../utils');
 
 exports.CreateFile = async (req, res, next) => {
   const {
-    FileParentPath, NewFileName, FileType, size,
+    FileParentPath, NewFileName, FileType, size, mediaId,
   } = req.body;
 
   if (!(FileParentPath && NewFileName && FileType)) {
@@ -47,14 +47,16 @@ exports.CreateFile = async (req, res, next) => {
       });
     }
     let contentDetails;
+    let existingDetails;
+
     switch (FileType) {
       case 'Game':
-        contentDetails = await Type.Game.create({});
-        break;
       case 'Movie':
-        contentDetails = await Type.Movie.create({});
+      case 'Series':
+      case 'Anime':
+        existingDetails = await Type[FileType].findOne({ mediaId });
+        contentDetails = existingDetails || await Type[FileType].create({ mediaId });
         break;
-
       default:
         next(new Error('Invalid FileType'));
     }

@@ -11,10 +11,11 @@ const path = require('path');
 const Folder = require('./model/folders');
 const Type = require('./model/type');
 const utils = require('./utils');
-const steam = require('./fileParsing/steam');
+const media = require('./fileParsing/media');
 const UserController = require('./controllers/UserController');
 const FolderController = require('./controllers/FolderController');
 const FileController = require('./controllers/FileController');
+const MediaController = require('./controllers/MediaController');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.delete('/deleteFolder', FolderController.DeleteFolder);
 
 app.post('/createFile', FileController.CreateFile);
 app.delete('/deleteFile', FileController.DeleteFile);
+app.post('/mediaSearch', MediaController.search);
 
 app.get('/', async (req, res) => {
   const folder = await Folder.Folder.find({});
@@ -133,6 +135,45 @@ async function insertFiles(fileId, isOwned = false) {
 
 async function generateFileListItem(file, fileType, contentDetails, isOwned = false) {
   const fileIcon = setcommonAttributes(fileType);
+  let mediaData;
+  switch (fileType) {
+    case 'Game':
+      mediaData = contentDetails.description ? contentDetails : await media.getGameDetails(contentDetails.mediaId);
+      break;
+    case 'Movie':
+      mediaData = contentDetails.description ? contentDetails : await media.getShowDetails(contentDetails.mediaId, MediaController.types.Movie);
+      break;
+    case 'Series':
+    case 'Anime':
+      mediaData = contentDetails.description ? contentDetails : await media.getShowDetails(contentDetails.mediaId, MediaController.types.Series);
+      break;
+
+    default:
+      throw new Error('Invalid file type');
+  }
+
+  if (mediaData && !contentDetails.description) {
+    const {
+      description, headerImage, release, genre,
+    } = mediaData;
+    if (fileType === 'Series' || fileType === 'Anime') {
+      const {
+        seasons, episodes, status,
+      } = mediaData;
+      await contentDetails.set({
+        mediaId: contentDetails.mediaId, description, headerImage, release, genre, seasons, episodes, status,
+      }).save();
+    } else {
+      await contentDetails.set({
+        mediaId: contentDetails.mediaId, description, headerImage, release, genre,
+      }).save();
+    }
+  }
+
+  return createFileElement(file, contentDetails, fileIcon, isOwned);
+}
+
+function createFileElement(file, mediaData, fileIcon, isOwned) {
   const commonAttributes = `
     <div class="baritem-1" title="${utils.escapeHTML(file.name)}">
       <i class="icon material-icons">${fileIcon}</i>
@@ -141,63 +182,20 @@ async function generateFileListItem(file, fileType, contentDetails, isOwned = fa
     <div class="baritem-2">${utils.formatDate(file.modifiedAt)}</div>
     <div class="baritem-3">${utils.escapeHTML(file.size)}</div>
   `;
-
-  switch (fileType) {
-    case 'Game': {
-      if (contentDetails.steamid == null) {
-        const steamId = await steam.getSteamId(file.name);
-        if (steamId !== -1) {
-          const steamUrl = `https://store.steampowered.com/api/appdetails?appids=${steamId}`;
-
-          const res = await axios({
-            method: 'get',
-            url: steamUrl,
-          });
-          const steamData = res.data[steamId].data;
-          await file.set({ name: steamData.name }).save();
-          await contentDetails.set({ steamid: steamId, headerImage: steamData.header_image, description: steamData.short_description }).save();
-        } else {
-          await contentDetails.set({ steamid: -1 }).save();
-        }
-      }
-
-      const gameData = contentDetails;
-      return `
-        <li class="list-item">
-          <a gd-type="application/pdf" onclick="showInfo('${utils.escapeHTML(file.name)}', '${utils.escapeHTML(gameData.description)}', '${gameData.headerImage}', '${gameData.steamid}', '${utils.escapeHTML(file.size)}', 'fuck it forgot to create the schema')">
-          <span hidden>${file.id}</span>
-            ${commonAttributes}
-          </a>
-          <div class="baritem-3">
-          ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
-            <button class="info-button" onclick="showInfo('${utils.escapeHTML(file.name)}', '${utils.escapeHTML(gameData.description)}', '${gameData.headerImage}', '${gameData.steamid}', '${utils.escapeHTML(file.size)}', 'fuck it forgot to create the schema')">
-              <i class="icon material-icons">info_outline</i>
-            </button>
-          </div>
-        </li>
-      `;
-    }
-    case 'Movie': {
-      const movieData = contentDetails;
-      return `
-        <li class="list-item">
-          <a gd-type="application/pdf" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
-          <span hidden>${file.id}</span>
-            ${commonAttributes}
-          </a>
-          <div class="baritem-3">
-            ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
-            <button class="info-button" onclick="showInfo('${file.name}', '${movieData.description}', '${movieData.headerImage}')">
-              <i class="icon material-icons">info_outline</i>
-            </button>
-          </div>
-        </li>
-      `;
-    }
-
-    default:
-      throw new Error('Invalid file type');
-  }
+  return `
+  <li class="list-item">
+    <a gd-type="application/pdf" onclick="showInfo('${utils.escapeHTML(file.name)}', \`${utils.escapeHTML(mediaData.description)}\`, '${mediaData.headerImage}', '${mediaData.mediaId}', '${utils.escapeHTML(file.size)}', '${mediaData.genre}', '${mediaData.release}', '${mediaData.seasons}', '${mediaData.episodes}', '${mediaData.status}')">
+    <span hidden>${file.id}</span>
+      ${commonAttributes}
+    </a>
+    <div class="baritem-3">
+    ${isOwned ? '<button class="file-delete-button material-icons">delete</button>' : ''}
+      <button class="info-button" onclick="showInfo('${utils.escapeHTML(file.name)}', \`${utils.escapeHTML(mediaData.description)}\`, '${mediaData.headerImage}', '${mediaData.mediaId}', '${utils.escapeHTML(file.size)}', '${mediaData.genre}', '${mediaData.release}', '${mediaData.seasons}', '${mediaData.episodes}', '${mediaData.status}')">
+        <i class="icon material-icons">info_outline</i>
+      </button>
+    </div>
+  </li>
+`;
 }
 
 function setcommonAttributes(fileType) {
