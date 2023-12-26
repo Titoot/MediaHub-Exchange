@@ -76,7 +76,7 @@ async function getTMDBList(searchQuery, type) {
 
   const reformattedJson = jsonData.map((result) => ({
     mediaId: result.id,
-    name: result.name,
+    name: result.name || result.title,
     image: `https://image.tmdb.org/t/p/w94_and_h141_bestv2/${result.poster_path}`,
     release: new Date(result.first_air_date).getFullYear(),
   }));
