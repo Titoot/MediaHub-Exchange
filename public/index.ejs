@@ -593,6 +593,9 @@
               <i class="search-icon material-icons">search</i>
             </button>
           </div>
+          <div class="indeterminate-progress-bar">
+            <div class="indeterminate-progress-bar__progress"></div>
+          </div>
           <div class="search-menu">
             <div class="item-row">
               <ul class="list">
@@ -641,6 +644,8 @@
       </form>
       <script>
           $('.search-type-button').on('click', function () {
+            const progessBar = $(".indeterminate-progress-bar").show();
+
             const fileTitle =  $(".newfile-form input#filename").val();
             const fileType = $('.newfile-form select#type').find(":selected").text();
             if($('.search-menu').is(':visible'))
@@ -661,7 +666,7 @@
             .then((response) => response.json())
             .then((data) => {
               if (data.success){
-
+                progessBar.hide()
               
               $.each(data.results, function(_, result) {
                 var standardItem = $('<li class="list-item">' +
