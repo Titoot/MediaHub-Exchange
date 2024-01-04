@@ -1,7 +1,8 @@
 .newfolder-form{
     /*min-height: 400px;*/
     height: auto;
-    width: 400px;
+    max-width: 400px;
+    min-width: 300px;
     position: fixed;
     transform: translate(-50%,-50%);
     top: 50%;
@@ -84,7 +85,8 @@ background-color: rgba(0,0,0,.1)
 .folder-delete-form{
     /*min-height: 400px;*/
     height: auto;
-    width: 400px;
+    max-width: 400px;
+    min-width: 300px;
     position: fixed;
     transform: translate(-50%,-50%);
     top: 50%;
@@ -205,7 +207,8 @@ background-color: rgba(0,0,0,.1)
 
 .newfile-form{
     height: auto;
-    width: 400px;
+    max-width: 400px;
+    min-width: 300px;
     position: fixed;
     transform: translate(-50%,-50%);
     top: 50%;
@@ -252,13 +255,15 @@ background-color: rgba(0,0,0,.1)
 .newfile-form select{
     display: block;
     height: 50px;
-    width: 105%;
+    width: 100%;
     background-color: #383f48;
     border-radius: 3px;
-    padding: 0 10px;
+    padding-left:10px;
     margin-top: 8px;
     font-size: 14px;
     font-weight: 300;
+    box-sizing: content-box;
+    padding-right: 2px;
 }
 
 .newfile-form .submit-button{
@@ -332,7 +337,8 @@ background-color: rgba(0,0,0,.1)
 
 .file-delete-form{
     height: auto;
-    width: 400px;
+    max-width: 400px;
+    min-width: 300px;
     position: fixed;
     transform: translate(-50%,-50%);
     top: 50%;

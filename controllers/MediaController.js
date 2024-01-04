@@ -11,7 +11,7 @@ exports.search = async (req, res, next) => {
   const { searchQuery, fileType } = req.body;
 
   if (!(searchQuery && fileType)) {
-    return res.status(400).json({ success: false, message: 'All Field Inputs Are Required' });
+    return res.status(400).json({ success: false, message: 'Please Put A Search Value Before Searching' });
   }
 
   const token = req.cookies.access_token;
