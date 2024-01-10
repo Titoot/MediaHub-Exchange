@@ -129,7 +129,7 @@ exports.isLoggedIn = async (req, res, next) => {
     }
   } catch (brr) {
     res.locals.isLoggedIn = false;
-    next(brr);
+    next();
     return;
   }
 
