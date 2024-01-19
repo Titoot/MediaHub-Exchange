@@ -7,44 +7,6 @@ const types = {
   Anime: 'anime',
 };
 
-exports.search = async (req, res, next) => {
-  const { searchQuery, fileType } = req.body;
-
-  if (!(searchQuery && fileType)) {
-    return res.status(400).json({ success: false, message: 'Please Put A Search Value Before Searching' });
-  }
-
-  const token = req.cookies.access_token;
-  const isLoggedIn = await UserController.isLoggedInF(token);
-  if (!isLoggedIn) {
-    return res.status(401).json({ success: false, message: 'User Unauthenticated' });
-  }
-  try {
-    let result;
-    switch (fileType) {
-      case 'Game':
-        result = await getRawgList(searchQuery);
-        break;
-      case 'Movie':
-        result = await getTMDBList(searchQuery, types.Movie);
-        break;
-      case 'Series':
-      case 'Anime':
-        result = await getTMDBList(searchQuery, types.Series);
-        break;
-
-      default:
-        next(new Error('Invalid FileType'));
-    }
-    if (result === -1) {
-      return res.status(404).json({ success: false, message: 'No Results Found' });
-    }
-    return res.status(200).json({ success: true, results: result });
-  } catch (brr) {
-    next(brr);
-  }
-};
-
 async function getRawgList(searchQuery) {
   const url = `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${searchQuery}&page_size=10&platforms=4`; // 4 === PC
   const response = await axios.get(url);
@@ -58,7 +20,7 @@ async function getRawgList(searchQuery) {
     mediaId: result.id,
     slug: result.slug,
     name: result.name,
-    image: result.background_image.replace('/media/', '/media/resize/420/-/'),
+    image: result.background_image?.replace('/media/', '/media/resize/420/-/') ?? null,
     release: new Date(result.released).getFullYear(),
   }));
 
@@ -84,4 +46,45 @@ async function getTMDBList(searchQuery, type) {
   return reformattedJson;
 }
 
-exports.types = types;
+async function getMetaData(searchQuery, fileType, next) {
+  switch (fileType) {
+    case 'Game':
+      return getRawgList(searchQuery);
+
+    case 'Movie':
+      return getTMDBList(searchQuery, types.Movie);
+
+    case 'Series':
+    case 'Anime':
+      return getTMDBList(searchQuery, types.Series);
+
+    default:
+      next(new Error('Invalid FileType'));
+  }
+}
+
+async function search(req, res, next) {
+  const { searchQuery, fileType } = req.body;
+
+  if (!(searchQuery && fileType)) {
+    return res.status(400).json({ success: false, message: 'Please Put A Search Value Before Searching' });
+  }
+
+  const token = req.cookies.access_token;
+  const isLoggedIn = await UserController.isLoggedInF(token);
+  if (!isLoggedIn) {
+    return res.status(401).json({ success: false, message: 'User Unauthenticated' });
+  }
+  try {
+    const result = await getMetaData(searchQuery, fileType, next);
+
+    if (result === -1) {
+      return res.status(404).json({ success: false, message: 'No Results Found' });
+    }
+    return res.status(200).json({ success: true, results: result });
+  } catch (brr) {
+    next(brr);
+  }
+}
+
+module.exports = { types, getMetaData, search };
