@@ -266,6 +266,19 @@ background-color: rgba(0,0,0,.1)
     padding-right: 2px;
 }
 
+.newfile-form textarea{
+    display: block;
+    width: 100%;
+    background-color: #383f48;
+    border-radius: 3px;
+    padding-left:10px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 300;
+    box-sizing: content-box;
+    padding-right: 2px;
+}
+
 .newfile-form .submit-button{
     margin-top: 50px;
     margin-left: 10px;

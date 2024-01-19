@@ -1,0 +1,44 @@
+.switcher-warpper {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.switcher-warpper ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.switcher-warpper li {
+    width: 53%;
+    float: left;
+    text-align: center;
+
+
+    background: #2f3744;
+    height: 40px;
+    text-align: center;
+    color: white;
+    line-height: 35px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.switcher-warpper .selected {
+    filter: brightness(90%);
+}
+
+.switcher-warpper li:hover {
+    filter: brightness(85%);
+}
+
+.switcher-warpper::after {
+    clear: both;
+    content: "";
+    display: table;
+}
+
+.bulk-container {
+    display: none;
+} 
