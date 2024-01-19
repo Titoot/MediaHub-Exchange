@@ -39,7 +39,9 @@ app.post('/createFolder', FolderController.CreateFolder);
 app.delete('/deleteFolder', FolderController.DeleteFolder);
 
 app.post('/createFile', FileController.CreateFile);
+app.post('/folderSync', FileController.folderSync);
 app.delete('/deleteFile', FileController.DeleteFile);
+
 app.post('/mediaSearch', MediaController.search);
 
 app.get('/', async (req, res) => {
