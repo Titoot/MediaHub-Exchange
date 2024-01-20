@@ -105,7 +105,7 @@ async function insertFolder(folderId, isSubFolder = false, routePath = null, isO
   if (!folder) {
     throw new Error({ message: 'Folder not found' });
   }
-  const name = isSubFolder ? path.join(routePath, folder.name) : folder.name;
+  const name = isSubFolder ? `${routePath}/${folder.name}` : folder.name;
   const icon = isSubFolder ? 'folder' : 'person';
 
   // if MainFolder get user location

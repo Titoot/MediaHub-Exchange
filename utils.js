@@ -1,5 +1,3 @@
-const path = require('path');
-
 function padTo2Digits(num) {
   return num.toString().padStart(2, '0');
 }
@@ -19,13 +17,8 @@ exports.formatDate = (date) => (
 );
 
 exports.pathNormalize = (oldPath) => {
-  let normalizedPath = oldPath.endsWith('/') ? oldPath.slice(0, -1) : oldPath;
-  normalizedPath += '\\';
-  const opsys = process.platform;
-  if (opsys === 'win32' || opsys === 'win64') {
-    return path.normalize(normalizedPath);
-  }
-  return normalizedPath.replace(/\//g, '\\'); // for unix systems
+  const path = oldPath.endsWith('/') ? oldPath : `${oldPath}/`;
+  return path.replace(/\\/g, '/');
 };
 
 exports.escapeRegExp = (string) => string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');

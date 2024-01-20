@@ -824,7 +824,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ FolderPath: foldername + '\\' }),
+            body: JSON.stringify({ FolderPath: foldername }),
           })
             .then((response) => response.json())
             .then((data) => {
